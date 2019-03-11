@@ -1,0 +1,29 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Project:</h2>
+E:\Senior Design Project\Software\Motor Driver\Testing\project.uvproj
+Project File Date:  11/17/2018
+
+<h2>Output:</h2>
+Rebuild target 'project'
+compiling project.c...
+project.c(34): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+                if(SampleCurrentFeedback() > 1.0){
+project.c(56): warning:  #550-D: variable "Voltage" was set but never used
+        float Voltage = 0;
+project.c: 2 warnings, 0 errors
+assembling startup_rvmdk.S...
+linking...
+Program Size: Code=4180 RO-data=1164 RW-data=0 ZI-data=256  
+After Build - User command #1: fromelf --bin --output .\rvmdk\project.bin .\rvmdk\project.axf
+".\rvmdk\project.axf" - 0 Error(s), 2 Warning(s).
+Load "E:\\Senior Design Project\\Software\\Motor Driver\\Testing\\rvmdk\\project.axf" 
+Connecting: Mode=JTAG, Speed=1000000Hz
+Erase Done.
+Programming Done.
+Verify OK.
+</pre>
+</body>
+</html>

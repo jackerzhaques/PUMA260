@@ -132,66 +132,6 @@ int main(void)
         //EIB LED
         GPIOPinWrite(GPIO_PORTM_BASE, GPIO_PIN_0, GPIO_PIN_0);
 #endif
-
-#ifdef TEST_SPI
-       /*
-        * SPI Transfer
-        *
-        * Transfer 60 bytes
-        */
-
-        //Encoder slave select
-        GPIOPinWrite(GPIO_PORTM_BASE, GPIO_PIN_1, 0);
-        GPIOPinWrite(GPIO_PORTM_BASE, GPIO_PIN_2, 0);
-        GPIOPinWrite(GPIO_PORTH_BASE, GPIO_PIN_0, 0);
-        GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_7, GPIO_PIN_7);
-
-       //Write the control word to read the encoder count
-       SSIDataPut(SSI3_BASE, 0x90);
-
-       //Wait until the transfer is complete
-       while(SSIBusy(SSI3_BASE)){
-
-       }
-
-       SSIDataPut(SSI3_BASE, 0xAA);
-
-       while(SSIBusy(SSI3_BASE))
-       {
-
-       }
-       GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_7, 0);
-
-       SysCtlDelay(SysCtlClockGet() / 1000);
-
-        //Enable encoder select
-        GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_7, GPIO_PIN_7);
-
-        //Write the control word to read the encoder count
-        SSIDataPut(SSI3_BASE, 0x48);
-
-        //Wait until the transfer is complete
-        while(SSIBusy(SSI3_BASE)){
-
-        }
-
-
-        //Read the data in
-        for(i = 0; i < 4; i++){
-            uint32_t ui32ReceivedData = 0;
-
-            //Grab the received data
-            while(SSIDataGetNonBlocking(SSI3_BASE, &ui32ReceivedData) > 0){
-
-            }
-
-            //Shift the data and add it to all received data (MSB First)
-            ui32ReceivedEncoderTicks += (ui32ReceivedData) << (3 - i);
-        }
-
-        //Deselect all devices
-        GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_7, 0);
-#endif
     }
 #endif
 }
@@ -217,25 +157,5 @@ void EnablePeripherals(void){
 
     PinoutSet();
 
-    //EnableSPI();
     SPI_Initialize();
-}
-
-//TODO: Remove this function once SPI module is implemented
-void EnableSPI(void){
-    uint32_t ui32SysClock;
-
-    SysCtlDelay(1);
-
-    //Configure the QSSI Interface
-    /*
-     * Mode:        SPI Master
-     * Frequency:   1MHz
-     * Data Size:   8bits
-     */
-    ui32SysClock = SysCtlClockGet();
-    SSIConfigSetExpClk(SSI3_BASE, ui32SysClock, SSI_FRF_MOTO_MODE_0, SSI_MODE_MASTER, 100000, 8);
-
-    //Enable the module
-    SSIEnable(SSI3_BASE);
 }

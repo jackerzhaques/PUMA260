@@ -14,6 +14,7 @@ ORDERED_OBJS += \
 "./pinout.obj" \
 "./tm4c1294ncpdt_startup_ccs.obj" \
 "./EIB/SPI.obj" \
+"./utils/uartstdio.obj" \
 "../tm4c1294ncpdt.cmd" \
 $(GEN_CMDS__FLAG) \
 -llibc.a \
@@ -28,8 +29,10 @@ RMDIR := RMDIR /S/Q
 -include sources.mk
 -include subdir_vars.mk
 -include EIB/subdir_vars.mk
+-include utils/subdir_vars.mk
 -include subdir_rules.mk
 -include EIB/subdir_rules.mk
+-include utils/subdir_rules.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
@@ -160,8 +163,8 @@ PUMA260.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(BIN_OUTPUTS__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "main.obj" "pinout.obj" "tm4c1294ncpdt_startup_ccs.obj" "EIB\SPI.obj" 
-	-$(RM) "main.d" "pinout.d" "tm4c1294ncpdt_startup_ccs.d" "EIB\SPI.d" 
+	-$(RM) "main.obj" "pinout.obj" "tm4c1294ncpdt_startup_ccs.obj" "EIB\SPI.obj" "utils\uartstdio.obj" 
+	-$(RM) "main.d" "pinout.d" "tm4c1294ncpdt_startup_ccs.d" "EIB\SPI.d" "utils\uartstdio.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

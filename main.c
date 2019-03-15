@@ -15,15 +15,21 @@
 #include "driverlib/pwm.h"
 #include "driverlib/adc.h"
 #include "driverlib/ssi.h"
+#include "driverlib/uart.h"
+#include "utils/uartstdio.h"
 
 
 void EnableClock(void);
 void EnablePeripherals(void);
+void InitConsole(void);
 
 int main(void)
 {
     EnableClock();
     EnablePeripherals();
+
+    UARTprintf("PUMA260 Robot\n");
+    UARTprintf("Hardware Initialized\n");
 
     //Slave select channel 0
     GPIOPinWrite(GPIO_PORTM_BASE, GPIO_PIN_1, 0);
@@ -155,7 +161,45 @@ void EnablePeripherals(void){
     //Enable the SPI Peripheral and wait for the clock to settle
     SysCtlPeripheralEnable(SYSCTL_PERIPH_SSI3);
 
+    InitConsole();
     PinoutSet();
-
     SPI_Initialize();
+}
+
+//Initializes UART0 to be used as a console.
+void InitConsole(void){
+    //
+    // Enable GPIO port A which is used for UART0 pins.
+    // TODO: change this to whichever GPIO port you are using.
+    //
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
+
+    //
+    // Configure the pin muxing for UART0 functions on port A0 and A1.
+    // This step is not necessary if your part does not support pin muxing.
+    // TODO: change this to select the port/pin you are using.
+    //
+    GPIOPinConfigure(GPIO_PA0_U0RX);
+    GPIOPinConfigure(GPIO_PA1_U0TX);
+
+    //
+    // Enable UART0 so that we can configure the clock.
+    //
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_UART0);
+
+    //
+    // Use the internal 16MHz oscillator as the UART clock source.
+    //
+    UARTClockSourceSet(UART0_BASE, UART_CLOCK_PIOSC);
+
+    //
+    // Select the alternate (UART) function for these pins.
+    // TODO: change this to select the port/pin you are using.
+    //
+    GPIOPinTypeUART(GPIO_PORTA_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+
+    //
+    // Initialize the UART for console I/O.
+    //
+    UARTStdioConfig(0, 115200, 16000000);
 }

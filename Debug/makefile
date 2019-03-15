@@ -13,6 +13,7 @@ ORDERED_OBJS += \
 "./main.obj" \
 "./pinout.obj" \
 "./tm4c1294ncpdt_startup_ccs.obj" \
+"./EIB/SPI.obj" \
 "../tm4c1294ncpdt.cmd" \
 $(GEN_CMDS__FLAG) \
 -llibc.a \
@@ -26,7 +27,9 @@ RMDIR := RMDIR /S/Q
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include subdir_vars.mk
+-include EIB/subdir_vars.mk
 -include subdir_rules.mk
+-include EIB/subdir_rules.mk
 -include objects.mk
 
 ifneq ($(MAKECMDGOALS),clean)
@@ -123,42 +126,42 @@ endif
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXE_OUTPUTS += \
-SMS.out \
+PUMA260.out \
 
 EXE_OUTPUTS__QUOTED += \
-"SMS.out" \
+"PUMA260.out" \
 
 BIN_OUTPUTS += \
-SMS.hex \
+PUMA260.hex \
 
 BIN_OUTPUTS__QUOTED += \
-"SMS.hex" \
+"PUMA260.hex" \
 
 
 # All Target
 all: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
-	@$(MAKE) --no-print-directory -Onone "SMS.out"
+	@$(MAKE) --no-print-directory -Onone "PUMA260.out"
 
 # Tool invocations
-SMS.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
+PUMA260.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: ARM Linker'
-	"C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=TARGET_IS_TM4C129_RA0 --define=PART_TM4C1294NCPDT -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"SMS.map" --heap_size=0 --stack_size=512 -i"C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/lib" -i"C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="SMS_linkInfo.xml" --rom_model -o "SMS.out" $(ORDERED_OBJS)
+	"C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=TARGET_IS_TM4C129_RA0 --define=PART_TM4C1294NCPDT -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"PUMA260.map" --heap_size=0 --stack_size=512 -i"C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/lib" -i"C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="PUMA260_linkInfo.xml" --rom_model -o "PUMA260.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 
-SMS.hex: $(EXE_OUTPUTS)
+PUMA260.hex: $(EXE_OUTPUTS)
 	@echo 'Building files: $(strip $(EXE_OUTPUTS__QUOTED))'
 	@echo 'Invoking: ARM Hex Utility'
-	"C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/bin/armhex"  -o "SMS.hex" $(EXE_OUTPUTS__QUOTED)
+	"C:/ti/ccsv8/tools/compiler/ti-cgt-arm_18.1.4.LTS/bin/armhex"  -o "PUMA260.hex" $(EXE_OUTPUTS__QUOTED)
 	@echo 'Finished building: $(strip $(EXE_OUTPUTS__QUOTED))'
 	@echo ' '
 
 # Other Targets
 clean:
 	-$(RM) $(BIN_OUTPUTS__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "main.obj" "pinout.obj" "tm4c1294ncpdt_startup_ccs.obj" 
-	-$(RM) "main.d" "pinout.d" "tm4c1294ncpdt_startup_ccs.d" 
+	-$(RM) "main.obj" "pinout.obj" "tm4c1294ncpdt_startup_ccs.obj" "EIB\SPI.obj" 
+	-$(RM) "main.d" "pinout.d" "tm4c1294ncpdt_startup_ccs.d" "EIB\SPI.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

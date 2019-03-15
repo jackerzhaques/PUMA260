@@ -1,6 +1,12 @@
-#include "pinout.h"
+//Standard includes
 #include <stdbool.h>
 #include <stdint.h>
+
+//Project includes
+#include "pinout.h"
+#include "EIB/SPI.h"
+
+//Tivaware includes
 #include "inc/hw_memmap.h"
 #include "driverlib/gpio.h"
 #include "driverlib/rom.h"
@@ -10,27 +16,41 @@
 #include "driverlib/adc.h"
 #include "driverlib/ssi.h"
 
-#define InvertPort  GPIO_PORTK_BASE
-#define InvertPin   GPIO_PIN_7
-
-//#define TEST_GPIO_OUTPUT
-//#define TEST_GPIO_INPUT
-//#define TEST_SPI
-//#define TEST_UART
-#define TEST_MOTORS
-//#define TEST_ADC
-
-#define ADC_BASE    ADC0_BASE
 
 void EnableClock(void);
 void EnablePeripherals(void);
-void EnableSPI(void);
 
 int main(void)
 {
-    int i;
     EnableClock();
     EnablePeripherals();
+
+    //Slave select channel 0
+    GPIOPinWrite(GPIO_PORTM_BASE, GPIO_PIN_1, 0);
+    GPIOPinWrite(GPIO_PORTM_BASE, GPIO_PIN_2, 0);
+    GPIOPinWrite(GPIO_PORTH_BASE, GPIO_PIN_0, 0);
+
+    //Chip deselect
+    GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_7, 0);
+    SysCtlDelay(SysCtlClockGet() / 10);
+
+    while(1){
+        uint8_t MDR0 = 0;
+
+        //Chip select
+        GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_7, GPIO_PIN_7);
+        SPI_Write(0x88);//Write MDR0 opcode
+        SPI_Write(0x80 | 0x00 | 0x00 | 0x03);//Filter 2, No Index, Free run, x4 Quadrature Count mode
+        GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_7, 0);
+
+        //Read MDR0 back
+        GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_7, GPIO_PIN_7);
+        SPI_Write(0x48);//Read MDR0 Opcode
+        MDR0 = SPI_Read();//Should be 0x83
+        GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_7, 0);
+    }
+
+#if 0
 
     //Enable PWM for PF1 (M0)
     //Set the PWM clock
@@ -173,6 +193,7 @@ int main(void)
         GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_7, 0);
 #endif
     }
+#endif
 }
 
 void EnableInvert(void);
@@ -196,9 +217,11 @@ void EnablePeripherals(void){
 
     PinoutSet();
 
-    EnableSPI();
+    //EnableSPI();
+    SPI_Initialize();
 }
 
+//TODO: Remove this function once SPI module is implemented
 void EnableSPI(void){
     uint32_t ui32SysClock;
 

@@ -35,7 +35,7 @@
 //
 //*****************************************************************************
 
-// This file was automatically generated on 3/13/2019 at 8:20:02 PM
+// This file was automatically generated on 3/14/2019 at 10:09:03 PM
 // by TI PinMux version 4.0.1530 
 //
 //*****************************************************************************
@@ -303,13 +303,6 @@ PinoutSet(void)
     //
 	MAP_GPIOPinConfigure(GPIO_PQ3_SSI3XDAT1);
 	MAP_GPIOPinTypeSSI(GPIO_PORTQ_BASE, GPIO_PIN_3);
-
-    //
-    // Configure the GPIO Pin Mux for PQ1
-	// for SSI3FSS
-    //
-	MAP_GPIOPinConfigure(GPIO_PQ1_SSI3FSS);
-	MAP_GPIOPinTypeSSI(GPIO_PORTQ_BASE, GPIO_PIN_1);
 
     //
     // Configure the GPIO Pin Mux for PQ0

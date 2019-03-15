@@ -4,7 +4,7 @@
 
 //Project includes
 #include "pinout.h"
-#include "EIB/SPI.h"
+#include "EIB/EncoderInterface.h"
 
 //Tivaware includes
 #include "inc/hw_memmap.h"
@@ -31,29 +31,16 @@ int main(void)
     UARTprintf("PUMA260 Robot\n");
     UARTprintf("Hardware Initialized\n");
 
-    //Slave select channel 0
-    GPIOPinWrite(GPIO_PORTM_BASE, GPIO_PIN_1, 0);
-    GPIOPinWrite(GPIO_PORTM_BASE, GPIO_PIN_2, 0);
-    GPIOPinWrite(GPIO_PORTH_BASE, GPIO_PIN_0, 0);
-
-    //Chip deselect
-    GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_7, 0);
-    SysCtlDelay(SysCtlClockGet() / 10);
-
     while(1){
-        uint8_t MDR0 = 0;
+        uint8_t i;
 
-        //Chip select
-        GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_7, GPIO_PIN_7);
-        SPI_Write(0x88);//Write MDR0 opcode
-        SPI_Write(0x80 | 0x00 | 0x00 | 0x03);//Filter 2, No Index, Free run, x4 Quadrature Count mode
-        GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_7, 0);
-
-        //Read MDR0 back
-        GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_7, GPIO_PIN_7);
-        SPI_Write(0x48);//Read MDR0 Opcode
-        MDR0 = SPI_Read();//Should be 0x83
-        GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_7, 0);
+        for(i = 0; i < ENC_SEL_COUNT; i++){
+            int32_t EncoderValue = 0;
+            EncoderDeviceSelect Encoder = (EncoderDeviceSelect)(i);
+            EncoderValue = EI_ReadEncoderValue(Encoder);
+            UARTprintf("Encoder%u: %i ", i + 1, EncoderValue);
+        }
+        UARTprintf("\n");
     }
 
 #if 0
@@ -163,7 +150,7 @@ void EnablePeripherals(void){
 
     InitConsole();
     PinoutSet();
-    SPI_Initialize();
+    EI_Initialize();
 }
 
 //Initializes UART0 to be used as a console.

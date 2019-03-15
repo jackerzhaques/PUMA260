@@ -13,6 +13,7 @@ ORDERED_OBJS += \
 "./main.obj" \
 "./pinout.obj" \
 "./tm4c1294ncpdt_startup_ccs.obj" \
+"./EIB/EncoderInterface.obj" \
 "./EIB/SPI.obj" \
 "./utils/uartstdio.obj" \
 "../tm4c1294ncpdt.cmd" \
@@ -163,8 +164,8 @@ PUMA260.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(BIN_OUTPUTS__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "main.obj" "pinout.obj" "tm4c1294ncpdt_startup_ccs.obj" "EIB\SPI.obj" "utils\uartstdio.obj" 
-	-$(RM) "main.d" "pinout.d" "tm4c1294ncpdt_startup_ccs.d" "EIB\SPI.d" "utils\uartstdio.d" 
+	-$(RM) "main.obj" "pinout.obj" "tm4c1294ncpdt_startup_ccs.obj" "EIB\EncoderInterface.obj" "EIB\SPI.obj" "utils\uartstdio.obj" 
+	-$(RM) "main.d" "pinout.d" "tm4c1294ncpdt_startup_ccs.d" "EIB\EncoderInterface.d" "EIB\SPI.d" "utils\uartstdio.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

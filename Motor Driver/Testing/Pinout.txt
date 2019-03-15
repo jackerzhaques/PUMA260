@@ -1,4 +1,0 @@
-PK0	Feedback
-PK6	SF
-PK7	Invert
-PF3	PWM

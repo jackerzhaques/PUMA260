@@ -1,12 +1,0 @@
-Dependencies for Project 'project', Target 'bitband': (DO NOT MODIFY !)
-F (.\project.c)(0x5BF0BD44)(-c --cpu Cortex-M4.fp -D__EVAL -D__MICROLIB -g -O2 --apcs=interwork --split_sections -I..\..\TivaWare --c99-I C:\Keil\ARM\RV31\INC-I C:\Keil\ARM\CMSIS\Include-I C:\Keil\ARM\Inc\Luminary-Drvmdk -DPART_TM4C1294NCPDT -DTARGET_IS_TM4C129_RA0-o .\rvmdk\project.o --omf_browse .\rvmdk\project.crf --depend .\rvmdk\project.d)
-I (C:\Keil\ARM\ARMCC\include\stdbool.h)(0x51C86004)
-I (C:\Keil\ARM\ARMCC\include\stdint.h)(0x51C86004)
-I (..\..\TivaWare\inc/hw_memmap.h)(0x5BF0891E)
-I (..\..\TivaWare\driverlib/gpio.h)(0x5BF08906)
-I (..\..\TivaWare\driverlib/rom.h)(0x5BF08906)
-I (..\..\TivaWare\driverlib/sysctl.h)(0x5BF08906)
-I (..\..\TivaWare\driverlib/pin_map.h)(0x5BF08906)
-I (..\..\TivaWare\driverlib/pwm.h)(0x5BF08906)
-F (.\startup_rvmdk.S)(0x5BF0891E)(--cpu Cortex-M4.fp --pd "__EVAL SETA 1" -g --apcs=interwork --pd "__MICROLIB SETA 1"-I C:\Keil\ARM\RV31\INC-I C:\Keil\ARM\CMSIS\Include-I C:\Keil\ARM\Inc\Luminary-o .\rvmdk\startup_rvmdk.o --depend .\rvmdk\startup_rvmdk.d)
-F (..\..\TivaWare\driverlib\rvmdk\driverlib.lib)(0x5BF08906)()

@@ -1,0 +1,195 @@
+******************************************************************************
+                  TI ARM Linker PC v18.1.4                     
+******************************************************************************
+>> Linked Thu Mar 14 20:33:00 2019
+
+OUTPUT FILE NAME:   <SMS.out>
+ENTRY POINT SYMBOL: "_c_int00_noinit_noargs"  address: 00000a9d
+
+
+MEMORY CONFIGURATION
+
+         name            origin    length      used     unused   attr    fill
+----------------------  --------  ---------  --------  --------  ----  --------
+  FLASH                 00000000   00100000  00000e02  000ff1fe  R  X
+  SRAM                  20000000   00040000  00000200  0003fe00  RW X
+
+
+SEGMENT ALLOCATION MAP
+
+run origin  load origin   length   init length attrs members
+----------  ----------- ---------- ----------- ----- -------
+00000000    00000000    00000e04   00000e04    r-x
+  00000000    00000000    00000208   00000208    r-- .intvecs
+  00000208    00000208    000009a6   000009a6    r-x .text
+  00000bb0    00000bb0    00000254   00000254    r-- .const
+20000000    20000000    00000200   00000000    rw-
+  20000000    20000000    00000200   00000000    rw- .stack
+
+
+SECTION ALLOCATION MAP
+
+ output                                  attributes/
+section   page    origin      length       input sections
+--------  ----  ----------  ----------   ----------------
+.intvecs   0    00000000    00000208     
+                  00000000    00000208     tm4c1294ncpdt_startup_ccs.obj (.intvecs)
+
+.text      0    00000208    000009a6     
+                  00000208    000003ec     pinout.obj (.text)
+                  000005f4    00000200     driverlib.lib : sysctl.obj (.text:SysCtlClockFreqSet)
+                  000007f4    00000110                   : sysctl.obj (.text:SysCtlClockGet)
+                  00000904    000000e0     main.obj (.text)
+                  000009e4    00000048     driverlib.lib : sysctl.obj (.text:_SysCtlFrequencyGet)
+                  00000a2c    0000003c                   : ssi.obj (.text:SSIConfigSetExpClk)
+                  00000a68    00000034                   : sysctl.obj (.text:SysCtlPeripheralEnable)
+                  00000a9c    00000030     rtsv7M4_T_le_v4SPD16_eabi.lib : boot_cortex_m.c.obj (.text:_c_int00_noinit_noargs:_c_int00_noinit_noargs)
+                  00000acc    00000022     driverlib.lib : pwm.obj (.text:PWMGenConfigure)
+                  00000aee    00000002     --HOLE-- [fill = 0]
+                  00000af0    00000020                   : sysctl.obj (.text:_SysCtlMemTimingGet)
+                  00000b10    0000001e                   : pwm.obj (.text:PWMPulseWidthSet)
+                  00000b2e    00000002     --HOLE-- [fill = 0]
+                  00000b30    00000014                   : sysctl.obj (.text:SysCtlPWMClockSet)
+                  00000b44    00000012                   : pwm.obj (.text:PWMGenPeriodGet)
+                  00000b56    00000012                   : pwm.obj (.text:PWMOutputState)
+                  00000b68    00000010                   : pwm.obj (.text:PWMGenPeriodSet)
+                  00000b78    0000000c                   : pwm.obj (.text:PWMGenEnable)
+                  00000b84    0000000c     tm4c1294ncpdt_startup_ccs.obj (.text)
+                  00000b90    0000000a     driverlib.lib : ssi.obj (.text:SSIEnable)
+                  00000b9a    00000006                   : gpio.obj (.text:GPIOPinWrite)
+                  00000ba0    00000006                   : sysctl.obj (.text:SysCtlDelay)
+                  00000ba6    00000004     rtsv7M4_T_le_v4SPD16_eabi.lib : pre_init.c.obj (.text:_system_pre_init)
+                  00000baa    00000004                                   : exit.c.obj (.text:abort:abort)
+
+.const     0    00000bb0    00000254     
+                  00000bb0    000001b0     driverlib.lib : sysctl.obj (.const:g_pppui32XTALtoVCO)
+                  00000d60    0000006c                   : sysctl.obj (.const:g_pui32Xtals)
+                  00000dcc    00000030                   : sysctl.obj (.const:g_sXTALtoMEMTIM)
+                  00000dfc    00000008                   : sysctl.obj (.const)
+
+.cinit     0    00000000    00000000     UNINITIALIZED
+
+.init_array 
+*          0    00000000    00000000     UNINITIALIZED
+
+.stack     0    20000000    00000200     UNINITIALIZED
+                  20000000    00000004     rtsv7M4_T_le_v4SPD16_eabi.lib : boot_cortex_m.c.obj (.stack)
+                  20000004    000001fc     --HOLE--
+
+MODULE SUMMARY
+
+       Module                          code   ro data   rw data
+       ------                          ----   -------   -------
+    .\
+       pinout.obj                      1004   0         0      
+       tm4c1294ncpdt_startup_ccs.obj   12     520       0      
+       main.obj                        224    0         0      
+    +--+-------------------------------+------+---------+---------+
+       Total:                          1240   520       0      
+                                                               
+    C:/ti/TivaWare_C_Series-2.1.4.178/driverlib/ccs/Debug/driverlib.lib
+       sysctl.obj                      966    596       0      
+       pwm.obj                         128    0         0      
+       ssi.obj                         70     0         0      
+       gpio.obj                        6      0         0      
+    +--+-------------------------------+------+---------+---------+
+       Total:                          1170   596       0      
+                                                               
+    C:\ti\ccsv8\tools\compiler\ti-cgt-arm_18.1.4.LTS\lib\rtsv7M4_T_le_v4SPD16_eabi.lib
+       boot_cortex_m.c.obj             48     0         0      
+       exit.c.obj                      4      0         0      
+       pre_init.c.obj                  4      0         0      
+    +--+-------------------------------+------+---------+---------+
+       Total:                          56     0         0      
+                                                               
+       Stack:                          0      0         512    
+    +--+-------------------------------+------+---------+---------+
+       Grand Total:                    2466   1116      512    
+
+
+GLOBAL SYMBOLS: SORTED ALPHABETICALLY BY Name 
+
+address   name                  
+-------   ----                  
+00000bab  C$$EXIT               
+00000977  EnableClock           
+00000983  EnablePeripherals     
+00000995  EnableSPI             
+00000b9b  GPIOPinWrite          
+00000acd  PWMGenConfigure       
+00000b79  PWMGenEnable          
+00000b45  PWMGenPeriodGet       
+00000b69  PWMGenPeriodSet       
+00000b57  PWMOutputState        
+00000b11  PWMPulseWidthSet      
+00000209  PinoutSet             
+00000b85  ResetISR              
+00000a2d  SSIConfigSetExpClk    
+00000b91  SSIEnable             
+000005f5  SysCtlClockFreqSet    
+000007f5  SysCtlClockGet        
+00000ba1  SysCtlDelay           
+00000b31  SysCtlPWMClockSet     
+00000a69  SysCtlPeripheralEnable
+20000200  __STACK_END           
+00000200  __STACK_SIZE          
+20000200  __STACK_TOP           
+ffffffff  __TI_pprof_out_hndl   
+ffffffff  __TI_prof_data_size   
+ffffffff  __TI_prof_data_start  
+00000000  __TI_static_base__    
+ffffffff  __binit__             
+ffffffff  __c_args__            
+UNDEFED   __mpu_init            
+20000000  __stack               
+00000a9d  _c_int00_noinit_noargs
+00000ba7  _system_pre_init      
+00000bab  abort                 
+ffffffff  binit                 
+00000000  g_pfnVectors          
+00000905  main                  
+
+
+GLOBAL SYMBOLS: SORTED BY Symbol Address 
+
+address   name                  
+-------   ----                  
+00000000  __TI_static_base__    
+00000000  g_pfnVectors          
+00000200  __STACK_SIZE          
+00000209  PinoutSet             
+000005f5  SysCtlClockFreqSet    
+000007f5  SysCtlClockGet        
+00000905  main                  
+00000977  EnableClock           
+00000983  EnablePeripherals     
+00000995  EnableSPI             
+00000a2d  SSIConfigSetExpClk    
+00000a69  SysCtlPeripheralEnable
+00000a9d  _c_int00_noinit_noargs
+00000acd  PWMGenConfigure       
+00000b11  PWMPulseWidthSet      
+00000b31  SysCtlPWMClockSet     
+00000b45  PWMGenPeriodGet       
+00000b57  PWMOutputState        
+00000b69  PWMGenPeriodSet       
+00000b79  PWMGenEnable          
+00000b85  ResetISR              
+00000b91  SSIEnable             
+00000b9b  GPIOPinWrite          
+00000ba1  SysCtlDelay           
+00000ba7  _system_pre_init      
+00000bab  C$$EXIT               
+00000bab  abort                 
+20000000  __stack               
+20000200  __STACK_END           
+20000200  __STACK_TOP           
+ffffffff  __TI_pprof_out_hndl   
+ffffffff  __TI_prof_data_size   
+ffffffff  __TI_prof_data_start  
+ffffffff  __binit__             
+ffffffff  __c_args__            
+ffffffff  binit                 
+UNDEFED   __mpu_init            
+
+[37 symbols]

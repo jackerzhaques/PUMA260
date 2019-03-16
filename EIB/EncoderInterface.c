@@ -8,6 +8,7 @@
  * Project includes
  */
 #include "EIB/SPI.h"
+#include "Globals.h"
 
 /*
  * Tivaware includes
@@ -15,6 +16,7 @@
 #include "driverlib/gpio.h"
 #include "inc/hw_memmap.h"
 #include "utils/uartstdio.h"
+#include <driverlib/sysctl.h>
 
 /*
  * Pin defines
@@ -41,6 +43,8 @@ void EI_Initialize(void){
 
     //Default the slave select channel to 0
     SelectEncoderChannel(ENC_SEL_1);
+
+    SysCtlDelay(CLOCK_FREQ / 100);
 
     //Initialize each channel
     for(i = 0; i < ENC_SEL_COUNT; i++){

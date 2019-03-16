@@ -4,7 +4,7 @@
 
 //Project includes
 #include "pinout.h"
-#include "EIB/EncoderInterface.h"
+#include "EIB/Encoders.h"
 
 //Tivaware includes
 #include "inc/hw_memmap.h"
@@ -31,20 +31,9 @@ int main(void)
     UARTprintf("PUMA260 Robot\n");
     UARTprintf("Hardware Initialized\n");
 
-    while(1){
-        uint8_t i;
 
-        for(i = 0; i < ENC_SEL_COUNT; i++){
-            int32_t EncoderValue = 0;
-            EncoderDeviceSelect Encoder = (EncoderDeviceSelect)(i);
-            EncoderValue = EI_ReadEncoderValue(Encoder);
-            UARTprintf("Encoder%u: %i ", i + 1, EncoderValue);
-        }
-        UARTprintf("\n");
-    }
-
-#if 0
-
+    //Enable the motor
+    GPIOPinWrite(GPIO_PORTD_BASE, GPIO_PIN_0, GPIO_PIN_0);
     //Enable PWM for PF1 (M0)
     //Set the PWM clock
     SysCtlPWMClockSet(SYSCTL_PWMDIV_1);
@@ -52,39 +41,38 @@ int main(void)
     //Enable the PWM peripheral and wait
     SysCtlPeripheralEnable(SYSCTL_PERIPH_PWM0);
 
-    //Enable GPIO Port F
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
-
     //Wait for the clock to stabilize
     SysCtlDelay(1);
 
     //Conifgure PWM0 to count up/down without synchronization
-    PWMGenConfigure(PWM0_BASE, PWM_GEN_0, PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
+    PWMGenConfigure(PWM0_BASE, PWM_GEN_2, PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
     //PWMGenConfigure(PWM0_BASE, PWM_GEN_2, PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
     //PWMGenConfigure(PWM0_BASE, PWM_GEN_3, PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
 
     //Set the PWM frequency to 250Hz
     //N = (1 / f) * SysClk, where N is the function parameter and f is the frequency
-    PWMGenPeriodSet(PWM0_BASE, PWM_GEN_0, 64000);
+    PWMGenPeriodSet(PWM0_BASE, PWM_GEN_2, 64000);
     //PWMGenPeriodSet(PWM0_BASE, PWM_GEN_2, 64000);
     //PWMGenPeriodSet(PWM0_BASE, PWM_GEN_3, 64000);
 
     //Set the duty cycle to 25%
     //Duty cycle is a function of the period, use PWMGenPeriodGet()
     //For a frequency of 25%, Calculation is N * 25%
-    PWMPulseWidthSet(PWM0_BASE, PWM_OUT_1, PWMGenPeriodGet(PWM0_BASE, PWM_GEN_0) / 4);
+    PWMPulseWidthSet(PWM0_BASE, PWM_OUT_4, PWMGenPeriodGet(PWM0_BASE, PWM_GEN_2) / 4);
     //PWMPulseWidthSet(PWM0_BASE, PWM_OUT_2, PWMGenPeriodGet(PWM0_BASE, PWM_GEN_2) / 4);
     //PWMPulseWidthSet(PWM0_BASE, PWM_OUT_3, PWMGenPeriodGet(PWM0_BASE, PWM_GEN_2) / 4);
     //PWMPulseWidthSet(PWM0_BASE, PWM_OUT_4, PWMGenPeriodGet(PWM0_BASE, PWM_GEN_3) / 4);
 
     //Enable the PWM Bit3(PF3) signal
-    PWMOutputState(PWM0_BASE, PWM_OUT_1_BIT, true);
+    PWMOutputState(PWM0_BASE, PWM_OUT_4_BIT, true);
 
     //Enable the PWM generator block
-    PWMGenEnable(PWM0_BASE, PWM_GEN_0);
+    PWMGenEnable(PWM0_BASE, PWM_GEN_2);
 
     while(1)
     {
+    }
+#if 0
         uint32_t ui32ReceivedEncoderTicks;
 
 #ifdef TEST_MOTORS
@@ -150,7 +138,7 @@ void EnablePeripherals(void){
 
     InitConsole();
     PinoutSet();
-    EI_Initialize();
+    Enc_Initialize();
 }
 
 //Initializes UART0 to be used as a console.

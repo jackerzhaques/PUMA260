@@ -88,12 +88,12 @@ void SetJointSpeed(JOINT_POSITION Joint, float Speed){
     }
 
     if(Speed < 0){
-        SpeedPIDs[Joint].OutputMin = -0.75;
-        SpeedPIDs[Joint].OutputMax = 0;
+        //SpeedPIDs[Joint].OutputMin = -0.75;
+        //SpeedPIDs[Joint].OutputMax = 0;
     }
     else{
-        SpeedPIDs[Joint].OutputMin = 0;
-        SpeedPIDs[Joint].OutputMax = 0.75;
+        //SpeedPIDs[Joint].OutputMin = 0;
+        //SpeedPIDs[Joint].OutputMax = 0.75;
     }
 
     SpeedPIDs[Joint].Target = Speed;

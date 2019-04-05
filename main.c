@@ -37,11 +37,13 @@ int main(void)
     UARTprintf("PUMA260 Robot\n");
     UARTprintf("Hardware Initialized\n");
 
+    SetJointSpeed(JOINT1, 0);
+
     while(1){
-        SetJointSpeed(JOINT1, 2000);
-        SysCtlDelay(30000000);
-        SetJointSpeed(JOINT1, -2000);
-        SysCtlDelay(30000000);
+        SetJointSpeed(JOINT2, -1000);
+        SysCtlDelay(120000000);
+        SetJointSpeed(JOINT2, 1000);
+        SysCtlDelay(120000000);
     }
 
     /*

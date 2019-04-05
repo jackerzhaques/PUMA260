@@ -2,6 +2,7 @@
 #define GLOBALS_H
 
 #define CLOCK_FREQ      120000000
+#define NULL            0
 
 typedef enum{
     JOINT1,

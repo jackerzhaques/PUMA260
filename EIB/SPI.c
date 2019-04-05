@@ -11,6 +11,8 @@
 #include "driverlib/pin_map.h"
 
 //Forward declarations
+void SPITransmitDoneISR(void);
+void SPIReadDoneISR(void);
 
 void SPI_Initialize(void){
     uint32_t ui32SysClock;
@@ -24,7 +26,7 @@ void SPI_Initialize(void){
      */
     ui32SysClock = SysCtlClockGet();
     SSIConfigSetExpClk(SSI3_BASE, ui32SysClock, SSI_FRF_MOTO_MODE_0,
-                       SSI_MODE_MASTER, 200000, 8);
+                       SSI_MODE_MASTER, 500000, 8);
 
     //Enable the module
     SSIEnable(SSI3_BASE);

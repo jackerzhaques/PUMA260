@@ -33,8 +33,33 @@ void UpdateEncoders(void){
     for(i = 0; i < JOINT_COUNT; i++){
         EncoderDeviceSelect Encoder = (EncoderDeviceSelect)(i);
         JointValues[i] = EI_ReadEncoderValue(Encoder);
+
+        //Calculate the speed in ticks per second
+        float EncoderSpeed = SAMPLE_RATE *
+                (JointValues[i] - Encoders[i].EncoderCount);
+
+        //Use a simple IIR filter on the speed
+        float FilteredSpeed = (FILTER_WEIGHT * Encoders[i].Speed)
+                + ((1 - FILTER_WEIGHT) * EncoderSpeed);
+
+        if(FilteredSpeed > 4000){
+            FilteredSpeed = 4000;
+        }
+        else if(FilteredSpeed < -4000){
+            FilteredSpeed = -4000;
+        }
+
+
+        float Degrees = JointValues[i] / 5.25;
+
+        Encoders[i].EncoderCount = JointValues[i];
+        Encoders[i].Speed = FilteredSpeed;
+        Encoders[i].Degrees = Degrees;
+
+        float Rotations = abs(Degrees) / 360;
     }
 
+    /*
     //For each joint calculate the speed and angle
     for(i = 0; i < JOINT_COUNT; i++){
 
@@ -49,12 +74,14 @@ void UpdateEncoders(void){
         //Convert the speed to degrees
         float SpeedInDegrees = FilteredSpeed;
 
-        float Degrees = JointValues[i] / 2000;
+        float Degrees = JointValues[i] / 5.25;
 
         Encoders[i].EncoderCount = JointValues[i];
         Encoders[i].Speed = SpeedInDegrees;
         Encoders[i].Degrees = Degrees;
-    }
+
+        float Rotations = abs(Degrees) / 360;
+    }*/
 
     TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
 }
@@ -68,7 +95,7 @@ void Enc_Initialize(void){
 }
 
 void InitializeTimer0(void){
-    //Initialize Timer2
+    //Initialize Timer0
     SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);
 
     //Wait for the clock to stabilize

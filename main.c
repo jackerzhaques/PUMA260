@@ -5,6 +5,8 @@
 //Project includes
 #include "pinout.h"
 #include "EIB/Encoders.h"
+#include "MotorDriver/MotorDriver.h"
+#include "ControlLoop/ControlLoop.h"
 
 //Tivaware includes
 #include "inc/hw_memmap.h"
@@ -17,6 +19,10 @@
 #include "driverlib/ssi.h"
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
+
+//Testing
+#include <math.h>
+double out, angle;
 
 
 void EnableClock(void);
@@ -31,9 +37,27 @@ int main(void)
     UARTprintf("PUMA260 Robot\n");
     UARTprintf("Hardware Initialized\n");
 
+    while(1){
+        SetJointSpeed(JOINT1, 2000);
+        SysCtlDelay(30000000);
+        SetJointSpeed(JOINT1, -2000);
+        SysCtlDelay(30000000);
+    }
 
+    /*
+    uint32_t i;
+    for(i = 0; i < 1000000; i++){
+        angle = (double)i / 200;
+        out = sin(angle) * 1000;
+        SetJointSpeed(JOINT1, out);
+        SysCtlDelay(100000);
+    }
+    MD_EnableMotor(JOINT1, false);
+*/
+    /*
     //Enable the motor
     GPIOPinWrite(GPIO_PORTD_BASE, GPIO_PIN_0, GPIO_PIN_0);
+    GPIOPinWrite(GPIO_PORTL_BASE, GPIO_PIN_1, GPIO_PIN_1);
     //Enable PWM for PF1 (M0)
     //Set the PWM clock
     SysCtlPWMClockSet(SYSCTL_PWMDIV_1);
@@ -54,23 +78,28 @@ int main(void)
     PWMGenPeriodSet(PWM0_BASE, PWM_GEN_2, 64000);
     //PWMGenPeriodSet(PWM0_BASE, PWM_GEN_2, 64000);
     //PWMGenPeriodSet(PWM0_BASE, PWM_GEN_3, 64000);
-
     //Set the duty cycle to 25%
     //Duty cycle is a function of the period, use PWMGenPeriodGet()
     //For a frequency of 25%, Calculation is N * 25%
-    PWMPulseWidthSet(PWM0_BASE, PWM_OUT_4, PWMGenPeriodGet(PWM0_BASE, PWM_GEN_2) / 4);
+    PWMPulseWidthSet(PWM0_BASE, PWM_OUT_4, 0.0*PWMGenPeriodGet(PWM0_BASE, PWM_GEN_2));
+    PWMPulseWidthSet(PWM0_BASE, PWM_OUT_5, 0.25*PWMGenPeriodGet(PWM0_BASE, PWM_GEN_2));
     //PWMPulseWidthSet(PWM0_BASE, PWM_OUT_2, PWMGenPeriodGet(PWM0_BASE, PWM_GEN_2) / 4);
     //PWMPulseWidthSet(PWM0_BASE, PWM_OUT_3, PWMGenPeriodGet(PWM0_BASE, PWM_GEN_2) / 4);
     //PWMPulseWidthSet(PWM0_BASE, PWM_OUT_4, PWMGenPeriodGet(PWM0_BASE, PWM_GEN_3) / 4);
 
     //Enable the PWM Bit3(PF3) signal
     PWMOutputState(PWM0_BASE, PWM_OUT_4_BIT, true);
+    PWMOutputState(PWM0_BASE, PWM_OUT_5_BIT, true);
 
     //Enable the PWM generator block
     PWMGenEnable(PWM0_BASE, PWM_GEN_2);
+*/
 
     while(1)
     {
+        //MD_EnableMotor(JOINT1, true);
+        //MD_SetMotorDirection(JOINT1, true);
+        //MD_SetMotorDutyCycle(JOINT1, 0.1);
     }
 #if 0
         uint32_t ui32ReceivedEncoderTicks;
@@ -138,7 +167,8 @@ void EnablePeripherals(void){
 
     InitConsole();
     PinoutSet();
-    Enc_Initialize();
+    //MD_Initialize();
+    InitializeControlLoop();
 }
 
 //Initializes UART0 to be used as a console.

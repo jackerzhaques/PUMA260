@@ -11,8 +11,8 @@
 #define     J1_S_IMAX   2
 #define     J1_S_TMIN  -2000
 #define     J1_S_TMAX   2000
-#define     J1_S_OMIN  -0.85
-#define     J1_S_OMAX   0.85
+#define     J1_S_OMIN  -0.75
+#define     J1_S_OMAX   0.75
 #define     J2_S_KP     0.00008
 #define     J2_S_KI     0.000014
 #define     J2_S_KD     0.0000003
@@ -20,8 +20,8 @@
 #define     J2_S_IMAX   2
 #define     J2_S_TMIN  -2000
 #define     J2_S_TMAX   2000
-#define     J2_S_OMIN  -0.75
-#define     J2_S_OMAX   0.75
+#define     J2_S_OMIN  -0.85
+#define     J2_S_OMAX   0.85
 #define     J3_S_KP     0
 #define     J3_S_KI     0
 #define     J3_S_KD     0

@@ -23,6 +23,7 @@ void InitializeTimer1(void);
 
 //PID structs
 sPID *SpeedPIDs = NULL;
+sPID *PositionPIDs = NULL;
 
 //File global variables
 PositionVector RobotArm = {0,0,0,0,0,0};
@@ -33,6 +34,7 @@ void InitializeControlLoop(void){
 
     //Get a reference to the PIDs
     SpeedPIDs = GetSpeedPIDs();
+    PositionPIDs = GetPositionPIDs();
 
     //Initialize motor drivers
     MD_Initialize();
@@ -97,12 +99,16 @@ void SetJointSpeed(JOINT_POSITION Joint, float Speed){
     }
 
     SpeedPIDs[Joint].Target = Speed;
-
 }
 
 void SetJointAngle(JOINT_POSITION Joint, float Angle){
-    //TODO: Implement Angles
-    //AnglePIDs[Joint].Target = Angle;
+    if(Angle > PositionPIDs[Joint].TargetMax){
+        Angle = PositionPIDs[Joint].TargetMax;
+    }
+    else if(Angle < PositionPIDs[Joint].TargetMin){
+        Angle = PositionPIDs[Joint].TargetMin;
+    }
+    PositionPIDs[Joint].Target = Angle;
 }
 
 void SetArmPosition(PositionVector Vector){
@@ -120,55 +126,72 @@ void ControlLoopISR(void){
     //Update speed PID
     for(i = 0; i < JOINT_COUNT; i++){
         JOINT_POSITION Joint = (JOINT_POSITION)(i);
-        sPID* PID = &SpeedPIDs[i];
+        sPID* SpeedPID = &SpeedPIDs[i];
+        sPID* PositionPID = &PositionPIDs[i];
         sEncoder *Enc = Enc_GetJointEncoder(Joint);
 
-        //Bound the target if necessary
-        if(PID->Target > PID->TargetMax){
-            PID->Target = PID->TargetMax;
+        /*
+         * Position
+         */
+        float PositionError = PositionPID->Target - Enc->Degrees;
+        float PositionProportional = PositionPID->Kp * PositionError;
+        PositionPID->iState += PositionError * PositionPID->Ki;
+        float PositionDerivative = (PositionError - PositionPID->dState) * PositionPID->Kd;
+        PositionPID->dState = PositionError;
+
+        PositionPID->Output = PositionProportional + PositionDerivative + PositionPID->iState;
+
+        if(PositionPID->Output > PositionPID->OutputMax){
+            PositionPID->Output = PositionPID->OutputMax;
         }
-        else if(PID->Target < PID->TargetMin){
-            PID->Target = PID->TargetMin;
+        else if(PositionPID->Output < PositionPID->OutputMin){
+            PositionPID->Output = PositionPID->OutputMin;
         }
+
+        SpeedPID->Target = PositionPID->Output;
+
+        /*
+         * Speed
+         */
 
         //Calculate Error
-        float Error = PID->Target - Enc->Speed;
+        float Error = SpeedPID->Target - Enc->Speed;
 
         //Calculate P and I terms
-        float P = Error * PID->Kp;
+        float P = Error * SpeedPID->Kp;
 
-        PID->iState += Error * PID->Ki;
-        if(PID->iState > PID->iMax){
-            PID->iState = PID->iMax;
+        SpeedPID->iState += Error * SpeedPID->Ki;
+        if(SpeedPID->iState > SpeedPID->iMax){
+            SpeedPID->iState = SpeedPID->iMax;
         }
-        else if(PID->iState < PID->iMin){
-            PID->iState = PID->iMin;
+        else if(SpeedPID->iState < SpeedPID->iMin){
+            SpeedPID->iState = SpeedPID->iMin;
         }
 
-        float I = PID->iState;
+        float I = SpeedPID->iState;
 
-        float D = (Error - PID->dState) * PID->Kd;
-        PID->dState = Error;
+        float D = (Error - SpeedPID->dState) * SpeedPID->Kd;
+        SpeedPID->dState = Error;
 
         float Output = P + I + D;
-        if(Output > PID->OutputMax){
-            Output = PID->OutputMax;
+        if(Output > SpeedPID->OutputMax){
+            Output = SpeedPID->OutputMax;
         }
-        else if(Output < PID->OutputMin){
-            Output = PID->OutputMin;
+        else if(Output < SpeedPID->OutputMin){
+            Output = SpeedPID->OutputMin;
         }
 
-        PID->Output = Output;
+        SpeedPID->Output = Output;
 
         //Set the motor speed
-        if(PID->Output < 0){
+        if(SpeedPID->Output < 0){
             MD_SetMotorDirection(Joint, false);
         }
         else{
             MD_SetMotorDirection(Joint, true);
         }
 
-        MD_SetMotorDutyCycle(Joint, fabs(PID->Output));
+        MD_SetMotorDutyCycle(Joint, fabs(SpeedPID->Output));
     }
 
     TimerIntClear(TIMER1_BASE, TIMER_TIMA_TIMEOUT);

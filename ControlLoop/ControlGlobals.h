@@ -34,5 +34,6 @@ typedef struct PositionVector_tag{
 
 
 sPID* GetSpeedPIDs(void);
+sPID* GetPositionPIDs(void);
 
 #endif

@@ -23,6 +23,15 @@ static sEncoder Encoders[JOINT_COUNT] = {
      {0,0,0,false,0,0,0,0}
 };
 
+static float TicksToDegrees[JOINT_COUNT] = {
+     0.0566627,
+     0.0399138,
+     0.0643542,
+     0,         //Unknown at 4-12-19
+     0.0891472,
+     0          //Unknown at 4-12-19
+};
+
 void UpdateEncoders(void){
     uint8_t i = 0;
     int32_t JointValues[JOINT_COUNT] = {0};
@@ -50,7 +59,7 @@ void UpdateEncoders(void){
         }
 
 
-        float Degrees = JointValues[i] / 5.25;
+        float Degrees = JointValues[i] * TicksToDegrees[i];
 
         Encoders[i].EncoderCount = JointValues[i];
         Encoders[i].Speed = FilteredSpeed;

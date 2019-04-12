@@ -31,22 +31,18 @@ void InitConsole(void);
 
 int main(void)
 {
+    uint8_t i = 0;
     EnableClock();
     EnablePeripherals();
 
     UARTprintf("PUMA260 Robot\n");
     UARTprintf("Hardware Initialized\n");
 
-    SetJointSpeed(JOINT1, 0);
-    SetJointSpeed(JOINT2, -1000);
-    SysCtlDelay(120000000);
-    SetJointSpeed(JOINT2, 0);
+    MD_EnableMotor(JOINT3, false);
+    SetJointAngle(JOINT1, 0);
+    SetJointAngle(JOINT2, 50);
 
     while(1){
-        SetJointSpeed(JOINT3, -1000);
-        SysCtlDelay(120000000);
-        SetJointSpeed(JOINT3, 1000);
-        SysCtlDelay(120000000);
     }
 
     /*

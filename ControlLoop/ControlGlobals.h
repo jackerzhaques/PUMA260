@@ -27,9 +27,7 @@ typedef struct PositionVector_tag{
     float x;
     float y;
     float z;
-    float phi;
     float theta;
-    float psi;
 } PositionVector;
 
 

@@ -14,5 +14,6 @@ void MD_EnableMotor(JOINT_POSITION Joint, bool bEnabled);
 void MD_SetMotorDutyCycle(JOINT_POSITION Joint, float DutyCycle);
 void MD_SetMotorDirection(JOINT_POSITION Joint, bool Clockwise);
 void MD_EnableBrake(bool bEnabled);
+float MD_GetMotorCurrent(JOINT_POSITION Joint);
 
 #endif

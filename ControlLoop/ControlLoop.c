@@ -17,9 +17,21 @@
 #include <driverlib/interrupt.h>
 #include <utils/uartstdio.h>
 
+/*
+ * Inverse Kinematics Defines
+ */
+
+#define     L1          13.0    //Length of joint1
+#define     L2          2.5     //Offset from j1 to j2
+#define     L3          8.0     //Length of joint2
+#define     L4          2.5     //Offset from j2 to j3
+#define     L5          8.0     //Length of joint3
+#define     L6          3.0     //Length of joint5
+
 //Forward declarations
 void ControlLoopISR(void);
 void InitializeTimer1(void);
+void FindJointLimits(void);
 
 //PID structs
 sPID *SpeedPIDs = NULL;
@@ -42,9 +54,6 @@ void InitializeControlLoop(void){
     //Initialize encoders
     Enc_Initialize();
 
-    //Initialize Timer1
-    InitializeTimer1();
-
     //Disable the brake for joints 1-3
     MD_EnableBrake(false);
 
@@ -52,6 +61,12 @@ void InitializeControlLoop(void){
     for(i = 0; i < JOINT_COUNT; i++){
         MD_EnableMotor((JOINT_POSITION)(i), true);
     }
+
+    //Initialize control loop timer
+    InitializeTimer1();
+
+    //Home each joint
+    FindJointLimits();
 }
 
 void InitializeTimer1(void){
@@ -79,6 +94,9 @@ void InitializeTimer1(void){
 
     //Enable master interrupts
     IntMasterEnable();
+}
+
+void FindJointLimits(void){
 }
 
 void SetJointSpeed(JOINT_POSITION Joint, float Speed){
@@ -111,8 +129,43 @@ void SetJointAngle(JOINT_POSITION Joint, float Angle){
     PositionPIDs[Joint].Target = Angle;
 }
 
-void SetArmPosition(PositionVector Vector){
+void SetArmPosition(PositionVector Target){
+    //See matlab script InverseKinematics for more info
+    float L_to_target = sqrt((Target.x * Target.x) + (Target.y * Target.y));
+    float L_Offsets = L2 + L4;
+    float Theta1 = atan2(Target.y,Target.x) - acosf(L_Offsets/L_to_target);
 
+    float OriginX = (L2 + L4) * cos(Theta1);
+    float OriginY = (L2 + L4) * sin(Theta1);
+    float Radius = sqrt(pow(Target.x - OriginX,2) + pow(Target.y - OriginY, 2));
+
+    float dx = cos(Target.theta * M_PI/180) * L6;
+    float dz = sin(Target.theta * M_PI/180) * L6;
+
+    float x = Radius - dx;
+    float y = (Target.z - dz) - L1;
+
+    float c2 = (pow(x,2) + pow(y,2) - pow(L3,2) - pow(L5,2)) / (2*L3*L5);
+    float s2 = sqrt(1 - pow(c2,2));
+    float Theta3 = atan2(s2,c2);
+
+    float k1 = L3 + L5*c2;
+    float k2 = L5 * s2;
+    float Theta2 = atan2(y,x) - atan2(k2,k1);
+    float Theta3_ToX = Theta2 + Theta3;
+    float Theta4 = Target.theta - Theta3_ToX;
+
+    //Convert all thetas to degrees
+    Theta1 *= 180/M_PI;
+    Theta2 *= 180/M_PI;
+    Theta3 *= 180/M_PI;
+    Theta4 *= 180/M_PI;
+
+    //Assign all angles
+    PositionPIDs[0].Target = Theta1;
+    PositionPIDs[1].Target = Theta2;
+    PositionPIDs[2].Target = Theta3;
+    PositionPIDs[4].Target = Theta4;
 }
 
 PositionVector* GetArmPosition(void){
@@ -135,7 +188,15 @@ void ControlLoopISR(void){
          */
         float PositionError = PositionPID->Target - Enc->Degrees;
         float PositionProportional = PositionPID->Kp * PositionError;
+
         PositionPID->iState += PositionError * PositionPID->Ki;
+        if(PositionPID->iState > PositionPID->iMax){
+            PositionPID->iState = PositionPID->iMax;
+        }
+        else if(PositionPID->iState < PositionPID->iMin){
+            PositionPID->iState = PositionPID->iMin;
+        }
+
         float PositionDerivative = (PositionError - PositionPID->dState) * PositionPID->Kd;
         PositionPID->dState = PositionError;
 
@@ -146,6 +207,9 @@ void ControlLoopISR(void){
         }
         else if(PositionPID->Output < PositionPID->OutputMin){
             PositionPID->Output = PositionPID->OutputMin;
+        }
+        else if(fabs(PositionPID->Output) < 10){
+            PositionPID->Output = 0;
         }
 
         SpeedPID->Target = PositionPID->Output;
@@ -174,20 +238,32 @@ void ControlLoopISR(void){
         SpeedPID->dState = Error;
 
         float Output = P + I + D;
-        if(Output > SpeedPID->OutputMax){
-            Output = SpeedPID->OutputMax;
-        }
-        else if(Output < SpeedPID->OutputMin){
-            Output = SpeedPID->OutputMin;
-        }
+        //if(SpeedPID->Target < 0){
+            //if(Output > 0){
+            //    Output = 0;
+            //}
+            if(Output < SpeedPID->OutputMin){
+                Output = SpeedPID->OutputMin;
+            }
+        //}
+        //else{
+            if(Output > SpeedPID->OutputMax){
+                Output = SpeedPID->OutputMax;
+            }
+            //else if(Output < 0){
+            //    Output = 0;
+            //}
+        //}
+
 
         SpeedPID->Output = Output;
 
-        //Set the motor speed
+        //Set the motor direction
+        //Do not change the direction if the speed is 0, induces oscillation
         if(SpeedPID->Output < 0){
             MD_SetMotorDirection(Joint, false);
         }
-        else{
+        else if(SpeedPID->Output > 0){
             MD_SetMotorDirection(Joint, true);
         }
 

@@ -5,13 +5,13 @@
 #define NULL            0
 
 typedef enum{
-    JOINT1,
-    JOINT2,
-    JOINT3,
-    JOINT4,
-    JOINT5,
-    JOINT6,
-    JOINT_COUNT
+    JOINT1      = 0,
+    JOINT2      = 1,
+    JOINT3      = 2,
+    JOINT4      = 3,
+    JOINT5      = 4,
+    JOINT6      = 5,
+    JOINT_COUNT = 6
 } JOINT_POSITION;
 
 #endif

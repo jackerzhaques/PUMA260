@@ -44,19 +44,18 @@ void UpdateEncoders(void){
         JointValues[i] = EI_ReadEncoderValue(Encoder);
 
         //Calculate the speed in ticks per second
-        float EncoderSpeed = SAMPLE_RATE *
-                (JointValues[i] - Encoders[i].EncoderCount);
+        float EncoderSpeed = SAMPLE_RATE * (JointValues[i] - Encoders[i].EncoderCount);
+
+        if(EncoderSpeed > 4000){
+            EncoderSpeed = 4000;
+        }
+        else if(EncoderSpeed < -4000){
+            EncoderSpeed = -4000;
+        }
 
         //Use a simple IIR filter on the speed
         float FilteredSpeed = (FILTER_WEIGHT * Encoders[i].Speed)
                 + ((1 - FILTER_WEIGHT) * EncoderSpeed);
-
-        if(FilteredSpeed > 4000){
-            FilteredSpeed = 4000;
-        }
-        else if(FilteredSpeed < -4000){
-            FilteredSpeed = -4000;
-        }
 
 
         float Degrees = JointValues[i] * TicksToDegrees[i];

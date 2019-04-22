@@ -10,6 +10,30 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/pwm.h"
 #include "driverlib/gpio.h"
+#include "driverlib/adc.h"
+
+#define ADC_VOLTAGE_CONVERSION              3.3 / 4096
+#define ADC_VOLTAGE_TO_CURRENT_CONVERSION   1.0/0.525
+
+const uint32_t ADC_BASE[JOINT_COUNT] = {
+                                  ADC0_BASE,
+                                  ADC0_BASE,
+                                  ADC0_BASE,
+                                  ADC0_BASE,
+                                  ADC1_BASE,
+                                  ADC1_BASE
+};
+
+const uint32_t ADC_SEQUENCE[JOINT_COUNT] = {
+                                  0,
+                                  1,
+                                  2,
+                                  3,
+                                  0,
+                                  1
+};
+
+void EnableADCs(void);
 
 void MD_Initialize(void){
     uint8_t i;
@@ -55,6 +79,51 @@ void MD_Initialize(void){
     PWMGenEnable(PWM0_BASE, PWM_GEN_0);
     PWMGenEnable(PWM0_BASE, PWM_GEN_1);
     PWMGenEnable(PWM0_BASE, PWM_GEN_2);
+
+    EnableADCs();
+}
+
+void EnableADCs(){
+    //Enable ADCs
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC1);
+
+    //Enable one sampler for each ADC input
+    ADCSequenceConfigure(ADC0_BASE, 0, ADC_TRIGGER_PROCESSOR, 0);
+    ADCSequenceConfigure(ADC0_BASE, 1, ADC_TRIGGER_PROCESSOR, 0);
+    ADCSequenceConfigure(ADC0_BASE, 2, ADC_TRIGGER_PROCESSOR, 0);
+    ADCSequenceConfigure(ADC0_BASE, 3, ADC_TRIGGER_PROCESSOR, 0);
+    ADCSequenceConfigure(ADC1_BASE, 0, ADC_TRIGGER_PROCESSOR, 0);
+    ADCSequenceConfigure(ADC1_BASE, 1, ADC_TRIGGER_PROCESSOR, 0);
+
+
+    //Configure each sequence step
+    ADCSequenceStepConfigure(ADC0_BASE, 0, 0, ADC_CTL_CH1 | ADC_CTL_IE | ADC_CTL_END);
+    ADCSequenceStepConfigure(ADC0_BASE, 1, 0, ADC_CTL_CH2 | ADC_CTL_IE | ADC_CTL_END);
+    ADCSequenceStepConfigure(ADC0_BASE, 2, 0, ADC_CTL_CH3 | ADC_CTL_IE | ADC_CTL_END);
+    ADCSequenceStepConfigure(ADC0_BASE, 3, 0, ADC_CTL_CH4 | ADC_CTL_IE | ADC_CTL_END);
+    ADCSequenceStepConfigure(ADC1_BASE, 0, 0, ADC_CTL_CH10| ADC_CTL_IE | ADC_CTL_END);
+    ADCSequenceStepConfigure(ADC1_BASE, 1, 0, ADC_CTL_CH6 | ADC_CTL_IE | ADC_CTL_END);
+
+    //Enable sequencers
+    ADCSequenceEnable(ADC0_BASE, 0);
+    ADCSequenceEnable(ADC0_BASE, 1);
+    ADCSequenceEnable(ADC0_BASE, 2);
+    ADCSequenceEnable(ADC0_BASE, 3);
+    ADCSequenceEnable(ADC1_BASE, 0);
+    ADCSequenceEnable(ADC1_BASE, 1);
+
+    //Set reference
+    ADCReferenceSet(ADC0_BASE, ADC_REF_INT);
+    ADCReferenceSet(ADC1_BASE, ADC_REF_INT);
+
+    //Clear the interrupt flags
+    ADCIntClear(ADC0_BASE, 0);
+    ADCIntClear(ADC0_BASE, 1);
+    ADCIntClear(ADC0_BASE, 2);
+    ADCIntClear(ADC0_BASE, 3);
+    ADCIntClear(ADC1_BASE, 0);
+    ADCIntClear(ADC1_BASE, 1);
 }
 
 void MD_EnableMotor(JOINT_POSITION Joint, bool bEnabled){
@@ -150,7 +219,7 @@ void MD_SetMotorDutyCycle(JOINT_POSITION Joint, float DutyCycle){
 }
 
 void MD_SetMotorDirection(JOINT_POSITION Joint, bool Clockwise){
-    if(Clockwise == true){
+    if(Clockwise){
         switch(Joint){
             case JOINT1:
                 GPIOPinWrite(GPIO_PORTH_BASE, GPIO_PIN_2, 0);
@@ -209,4 +278,27 @@ void MD_EnableBrake(bool bEnabled){
     else{
         GPIOPinWrite(GPIO_PORTM_BASE, GPIO_PIN_4, GPIO_PIN_4);
     }
+}
+
+float MD_GetMotorCurrent(JOINT_POSITION Joint){
+    uint32_t ADCValue = 0;
+    float Voltage = 0;
+    float Current = 0;
+
+    ADCProcessorTrigger(ADC_BASE[Joint], ADC_SEQUENCE[Joint]);
+
+    //Wait for conversion to finish
+    while(!ADCIntStatus(ADC_BASE[Joint], ADC_SEQUENCE[Joint], false)){
+
+    }
+
+    //Clear interrupt flag
+    ADCIntClear(ADC_BASE[Joint], ADC_SEQUENCE[Joint]);
+
+    //Read the value and convert to current
+    ADCSequenceDataGet(ADC_BASE[Joint], ADC_SEQUENCE[Joint], &ADCValue);
+    Voltage = ADCValue * ADC_VOLTAGE_CONVERSION;
+    Current = Voltage * ADC_VOLTAGE_TO_CURRENT_CONVERSION;
+
+    return Current;
 }

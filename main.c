@@ -19,15 +19,45 @@
 #include "driverlib/ssi.h"
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
+#include "driverlib/uart.h"
 
 //Testing
 #include <math.h>
-double out, angle;
-
+float angle = 0;
 
 void EnableClock(void);
 void EnablePeripherals(void);
 void InitConsole(void);
+
+void printfloat(char *Buffer, float val, int nDecimals){
+    int UpperVal = (int)(val);
+    int LowerVal = (uint32_t)(val * pow(10,nDecimals));
+    sprintf(Buffer, "%i.%u", UpperVal, LowerVal);
+}
+
+void Wait(float seconds, float Target){
+    static uint32_t SampleInterval = 120000000 / 10 / 3;
+    uint32_t DelayAmount = 120000000.0 * seconds / 3;
+    uint32_t nDelays = DelayAmount / SampleInterval;
+    uint32_t i = 0;
+    for(i = 0; i < nDelays; i++){
+        float EncVal = Enc_GetJointEncoder(JOINT3)->Degrees;
+        UARTCharPut(UART0_BASE, 0x02);
+        char Buffer[30];
+        printfloat(Buffer, EncVal, 2);
+        UARTprintf("1,");
+        UARTprintf(Buffer);
+        UARTCharPut(UART0_BASE, 0x0A);
+
+        UARTCharPut(UART0_BASE, 0x02);
+        printfloat(Buffer, Target, 2);
+        UARTprintf("2,");
+        UARTprintf(Buffer);
+        UARTCharPut(UART0_BASE, 0x0A);
+
+        SysCtlDelay(SampleInterval);
+    }
+}
 
 int main(void)
 {
@@ -35,14 +65,36 @@ int main(void)
     EnableClock();
     EnablePeripherals();
 
-    UARTprintf("PUMA260 Robot\n");
-    UARTprintf("Hardware Initialized\n");
+    float Targets[] = {0, -80};
+    float Delay[]   = {6, 6};
+    int nTargets = sizeof(Targets)/sizeof(float);
 
-    MD_EnableMotor(JOINT3, false);
-    SetJointAngle(JOINT1, 0);
-    SetJointAngle(JOINT2, 50);
+    UARTCharPut(UART0_BASE, 0x03);
+    UARTprintf("AA,FF,33");
+    UARTCharPut(UART0_BASE, 0x0A);
+
+    UARTCharPut(UART0_BASE, 0x01);
+    UARTprintf("1,Position");
+    UARTCharPut(UART0_BASE, 0x0A);
+    UARTCharPut(UART0_BASE, 0x01);
+    UARTprintf("2,Target");
+    UARTCharPut(UART0_BASE, 0x0A);
 
     while(1){
+        //angle = MD_GetMotorCurrent(JOINT3);
+        int i;
+        for(i = 0; i < nTargets; i++){
+            float Target = Targets[i];
+            SetJointAngle(JOINT1, Target);
+            Wait(Delay[i], Target);
+        }
+        /*
+        angle += 3.14/50;
+        float Target = sin(angle) * 50;
+        //SetJointSpeed(JOINT1, Speed);
+        SetJointAngle(JOINT1, Target);
+        SysCtlDelay(120000000 / 3 / 10);
+        */
     }
 
     /*

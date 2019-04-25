@@ -126,7 +126,19 @@ void SetJointAngle(JOINT_POSITION Joint, float Angle){
     else if(Angle < PositionPIDs[Joint].TargetMin){
         Angle = PositionPIDs[Joint].TargetMin;
     }
+
     PositionPIDs[Joint].Target = Angle;
+    PositionPIDs[Joint].iState = 0;
+
+    //Set the SpeedPID to travel in the correct direction at 500 ticks per second
+    float PositionError = Angle - Enc_GetJointEncoder(Joint)->Degrees;
+    if(PositionError < 0){
+        SpeedPIDs[Joint].Target = -CONTROL_SPEED;
+    }
+    else{
+        SpeedPIDs[Joint].Target = CONTROL_SPEED;
+    }
+    SpeedPIDs[Joint].iState = 0;
 }
 
 void SetArmPosition(PositionVector Target){
@@ -183,91 +195,92 @@ void ControlLoopISR(void){
         sPID* PositionPID = &PositionPIDs[i];
         sEncoder *Enc = Enc_GetJointEncoder(Joint);
 
-        /*
-         * Position
-         */
+        //Calculate the position error
         float PositionError = PositionPID->Target - Enc->Degrees;
-        float PositionProportional = PositionPID->Kp * PositionError;
 
-        PositionPID->iState += PositionError * PositionPID->Ki;
-        if(PositionPID->iState > PositionPID->iMax){
-            PositionPID->iState = PositionPID->iMax;
+        //Use position control when close, speed control when far
+        if(fabs(PositionError) < CONTROL_SWITCH_THRESHOLD){
+            if(Joint == JOINT1){
+            }
+            //Position control
+            float P = PositionPID->Kp * PositionError;
+            float I = PositionPID->iState + (PositionError * PositionPID->Ki);
+            float D = PositionPID->Kd * (PositionError - PositionPID->dState);
+            PositionPID->dState = PositionError;
+            //Bound outputs
+            if(I < PositionPID->iMin){
+                I = PositionPID->iMin;
+            }
+            else if(I > PositionPID->iMax){
+                I = PositionPID->iMax;
+            }
+            PositionPID->iState = I;
+
+            float Output = P + I + D;
+            if(Output < PositionPID->OutputMin){
+                Output = PositionPID->OutputMin;
+            }
+            else if(Output > PositionPID->OutputMax){
+                Output = PositionPID->OutputMax;
+            }
+
+            PositionPID->Output = Output;
+
+            //Set the output
+            if(PositionPID->Output < 0){
+                MD_SetMotorDirection(Joint, false);
+            }
+            else if(PositionPID->Output > 0){
+                MD_SetMotorDirection(Joint, true);
+            }
+
+            MD_SetMotorDutyCycle(Joint, fabs(PositionPID->Output));
         }
-        else if(PositionPID->iState < PositionPID->iMin){
-            PositionPID->iState = PositionPID->iMin;
-        }
+        else{
+            //Speed control
 
-        float PositionDerivative = (PositionError - PositionPID->dState) * PositionPID->Kd;
-        PositionPID->dState = PositionError;
+            //Calculate Error
+            float Error = SpeedPID->Target - Enc->Speed;
 
-        PositionPID->Output = PositionProportional + PositionDerivative + PositionPID->iState;
+            //Calculate P I and D terms
+            float P = Error * SpeedPID->Kp;
 
-        if(PositionPID->Output > PositionPID->OutputMax){
-            PositionPID->Output = PositionPID->OutputMax;
-        }
-        else if(PositionPID->Output < PositionPID->OutputMin){
-            PositionPID->Output = PositionPID->OutputMin;
-        }
-        else if(fabs(PositionPID->Output) < 10){
-            PositionPID->Output = 0;
-        }
+            SpeedPID->iState += Error * SpeedPID->Ki;
 
-        SpeedPID->Target = PositionPID->Output;
+            if(SpeedPID->iState > SpeedPID->iMax){
+                SpeedPID->iState = SpeedPID->iMax;
+            }
+            else if(SpeedPID->iState < SpeedPID->iMin){
+                SpeedPID->iState = SpeedPID->iMin;
+            }
 
-        /*
-         * Speed
-         */
+            float I = SpeedPID->iState;
 
-        //Calculate Error
-        float Error = SpeedPID->Target - Enc->Speed;
+            float D = (Error - SpeedPID->dState) * SpeedPID->Kd;
+            SpeedPID->dState = Error;
 
-        //Calculate P and I terms
-        float P = Error * SpeedPID->Kp;
-
-        SpeedPID->iState += Error * SpeedPID->Ki;
-        if(SpeedPID->iState > SpeedPID->iMax){
-            SpeedPID->iState = SpeedPID->iMax;
-        }
-        else if(SpeedPID->iState < SpeedPID->iMin){
-            SpeedPID->iState = SpeedPID->iMin;
-        }
-
-        float I = SpeedPID->iState;
-
-        float D = (Error - SpeedPID->dState) * SpeedPID->Kd;
-        SpeedPID->dState = Error;
-
-        float Output = P + I + D;
-        //if(SpeedPID->Target < 0){
-            //if(Output > 0){
-            //    Output = 0;
-            //}
+            float Output = P + I + D;
             if(Output < SpeedPID->OutputMin){
                 Output = SpeedPID->OutputMin;
             }
-        //}
-        //else{
-            if(Output > SpeedPID->OutputMax){
+            else if(Output > SpeedPID->OutputMax){
                 Output = SpeedPID->OutputMax;
             }
-            //else if(Output < 0){
-            //    Output = 0;
-            //}
-        //}
 
 
-        SpeedPID->Output = Output;
+            SpeedPID->Output = Output;
 
-        //Set the motor direction
-        //Do not change the direction if the speed is 0, induces oscillation
-        if(SpeedPID->Output < 0){
-            MD_SetMotorDirection(Joint, false);
+            //Set the motor direction
+            //Do not change the direction if the speed is 0, induces oscillation
+            if(SpeedPID->Output < 0){
+                MD_SetMotorDirection(Joint, false);
+            }
+            else if(SpeedPID->Output > 0){
+                MD_SetMotorDirection(Joint, true);
+            }
+
+            MD_SetMotorDutyCycle(Joint, fabs(SpeedPID->Output));
         }
-        else if(SpeedPID->Output > 0){
-            MD_SetMotorDirection(Joint, true);
-        }
-
-        MD_SetMotorDutyCycle(Joint, fabs(SpeedPID->Output));
     }
 
     TimerIntClear(TIMER1_BASE, TIMER_TIMA_TIMEOUT);

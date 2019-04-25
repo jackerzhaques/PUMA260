@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include "Globals.h"
 
-#define FILTER_WEIGHT   0.99
+#define FILTER_WEIGHT   0.95
 #define SAMPLE_RATE     1000
 
 typedef struct sEncoder_Tag{

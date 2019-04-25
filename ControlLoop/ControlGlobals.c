@@ -5,7 +5,7 @@
 *  Speed Control Defines
 */
 #define     J1_S_KP     0.002
-#define     J1_S_KI     0.00008
+#define     J1_S_KI     0.0001
 #define     J1_S_KD     0.00003
 #define     J1_S_IMIN  -2
 #define     J1_S_IMAX   2
@@ -61,16 +61,16 @@
 /*
 *  Angle Control Defines
 */
-#define     J1_A_KP     10
-#define     J1_A_KI     0.001
+#define     J1_A_KP     0
+#define     J1_A_KI     0
 #define     J1_A_KD     0
-#define     J1_A_IMIN  -1000
-#define     J1_A_IMAX   1000
+#define     J1_A_IMIN  -2
+#define     J1_A_IMAX   2
 #define     J1_A_TMIN  -145
 #define     J1_A_TMAX   145
 #define     J1_A_OMIN  -500
 #define     J1_A_OMAX   500
-#define     J2_A_KP     20
+#define     J2_A_KP     0
 #define     J2_A_KI     0
 #define     J2_A_KD     0
 #define     J2_A_IMIN  -3000
@@ -79,7 +79,7 @@
 #define     J2_A_TMAX   157.5
 #define     J2_A_OMIN  -1000
 #define     J2_A_OMAX   1000
-#define     J3_A_KP     15
+#define     J3_A_KP     0
 #define     J3_A_KI     0
 #define     J3_A_KD     0
 #define     J3_A_IMIN   0
@@ -97,7 +97,7 @@
 #define     J4_A_TMAX   0
 #define     J4_A_OMIN   0
 #define     J4_A_OMAX   0
-#define     J5_A_KP     5
+#define     J5_A_KP     0
 #define     J5_A_KI     0
 #define     J5_A_KD     0
 #define     J5_A_IMIN  -500

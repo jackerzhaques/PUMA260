@@ -5,6 +5,8 @@
 #include "ControlGlobals.h"
 
 #define ARM_CONTROL_LOOP_FREQUENCY  200
+#define CONTROL_SWITCH_THRESHOLD    20      //The error in degrees for when to switch from Speed controller to Position controller
+#define CONTROL_SPEED               750
 
 void InitializeControlLoop(void);
 

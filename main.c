@@ -80,14 +80,29 @@ int main(void)
     UARTprintf("2,Target");
     UARTCharPut(UART0_BASE, 0x0A);
 
-    PositionVector Target;
-    Target.x = -10;
-    Target.y = 10;
-    Target.z = 10;
-    Target.theta = 0;
-    SetArmPosition(Target);
+    float XVals[] = {-10, -10, -10, -10, -10, -10};
+    float YVals[] = {0,    2,  4,  6,  8,  10};
+    float ZVals[] = {5,    5,  5,  5,  5,  5};
+    float TVals[] = {0,    0,  0,  0,  0,  0};
+    int nVals = sizeof(XVals)/sizeof(float);
+
+
 
     while(1){
+        for(i = 0; i < nVals; i++){
+            PositionVector Target;
+            Target.x = XVals[i];
+            Target.y = YVals[i];
+            Target.z = ZVals[i];
+            Target.theta = TVals[i];
+            SetArmPosition(Target);
+            if(i == 0){
+                SysCtlDelay(120000000 / 2);
+            }
+            else{
+                SysCtlDelay(120000000 / 6);
+            }
+        }
     }
 
     /*

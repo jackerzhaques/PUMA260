@@ -200,7 +200,7 @@ void SetArmPosition(PositionVector Target){
     float y = (Target.z - dz) - L1;
 
     float c2 = (pow(x,2) + pow(y,2) - pow(L3,2) - pow(L5,2)) / (2*L3*L5);
-    float s2 = sqrt(1 - pow(c2,2));
+    float s2 = -sqrt(1 - pow(c2,2));    //Changing this sign to negative will make Joint 2 angle upwards. Positive is downwards
     float Theta3 = atan2(s2,c2);
 
     float k1 = L3 + L5*c2;

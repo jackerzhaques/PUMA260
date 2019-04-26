@@ -14,6 +14,7 @@
 
 #define ADC_VOLTAGE_CONVERSION              3.3 / 4096
 #define ADC_VOLTAGE_TO_CURRENT_CONVERSION   1.0/0.525
+#define ADC_FILTER_WEIGHT                   0.999
 
 const uint32_t ADC_BASE[JOINT_COUNT] = {
                                   ADC0_BASE,
@@ -31,6 +32,15 @@ const uint32_t ADC_SEQUENCE[JOINT_COUNT] = {
                                   3,
                                   0,
                                   1
+};
+
+float MotorCurrentFilteredValues[JOINT_COUNT] = {
+                                  0,
+                                  0,
+                                  0,
+                                  0,
+                                  0,
+                                  0
 };
 
 void EnableADCs(void);
@@ -300,5 +310,8 @@ float MD_GetMotorCurrent(JOINT_POSITION Joint){
     Voltage = ADCValue * ADC_VOLTAGE_CONVERSION;
     Current = Voltage * ADC_VOLTAGE_TO_CURRENT_CONVERSION;
 
-    return Current;
+    MotorCurrentFilteredValues[Joint] = (MotorCurrentFilteredValues[Joint] * ADC_FILTER_WEIGHT) +
+                                        (Current * (1 - ADC_FILTER_WEIGHT));
+
+    return MotorCurrentFilteredValues[Joint];
 }

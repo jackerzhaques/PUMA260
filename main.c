@@ -65,7 +65,7 @@ int main(void)
     EnableClock();
     EnablePeripherals();
 
-    float Targets[] = {0, -80};
+    float Targets[] = {-10, -80};
     float Delay[]   = {6, 6};
     int nTargets = sizeof(Targets)/sizeof(float);
 
@@ -80,21 +80,14 @@ int main(void)
     UARTprintf("2,Target");
     UARTCharPut(UART0_BASE, 0x0A);
 
+    PositionVector Target;
+    Target.x = -10;
+    Target.y = 10;
+    Target.z = 10;
+    Target.theta = 0;
+    SetArmPosition(Target);
+
     while(1){
-        //angle = MD_GetMotorCurrent(JOINT3);
-        int i;
-        for(i = 0; i < nTargets; i++){
-            float Target = Targets[i];
-            SetJointAngle(JOINT1, Target);
-            Wait(Delay[i], Target);
-        }
-        /*
-        angle += 3.14/50;
-        float Target = sin(angle) * 50;
-        //SetJointSpeed(JOINT1, Speed);
-        SetJointAngle(JOINT1, Target);
-        SysCtlDelay(120000000 / 3 / 10);
-        */
     }
 
     /*

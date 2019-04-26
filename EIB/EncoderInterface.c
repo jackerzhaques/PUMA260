@@ -88,13 +88,7 @@ void EI_WriteRegister(uint8_t OpCode, uint8_t Data, EncoderDeviceSelect Encoder)
 void EI_ClearEncoder(EncoderDeviceSelect Encoder){
     SelectEncoderChannel(Encoder);
     SetChipSelect(true);
-
     SPI_Write(CLR_CNTR);
-
-
-
-
-
     SetChipSelect(false);
 }
 

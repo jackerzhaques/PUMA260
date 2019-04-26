@@ -22,9 +22,9 @@
  */
 
 #define     L1          13.0    //Length of joint1
-#define     L2          2.5     //Offset from j1 to j2
+#define     L2         -2.5     //Offset from j1 to j2
 #define     L3          8.0     //Length of joint2
-#define     L4          2.5     //Offset from j2 to j3
+#define     L4         -2.5     //Offset from j2 to j3
 #define     L5          8.0     //Length of joint3
 #define     L6          3.0     //Length of joint5
 
@@ -65,8 +65,16 @@ void InitializeControlLoop(void){
     //Initialize control loop timer
     InitializeTimer1();
 
-    //Home each joint
+    //Attempt to home each joint
     FindJointLimits();
+
+    //Set each joint to its negative limits and home again
+    //This helps to ensure that no joints failed to home because of orientation
+    for(i = 0; i < JOINT_COUNT; i++){
+        JOINT_POSITION Joint = (JOINT_POSITION)i;
+        SetJointAngle(Joint, PositionPIDs[Joint].TargetMin);
+    }
+    //FindJointLimits();
 }
 
 void InitializeTimer1(void){
@@ -96,7 +104,41 @@ void InitializeTimer1(void){
     IntMasterEnable();
 }
 
+//The order of joints to home
+int JointIndexes[] = {1, 2, 0, 4, 3, 5};// Joint 2 -> 3 -> 1 -> 5 -> 4 -> 6
+
 void FindJointLimits(void){
+    int i = 0;
+    for(i = 0; i < JOINT_COUNT; i++){
+        int JointIndex = JointIndexes[i];
+        //Skip joints that are not being used
+        if(JointIndex == 3  || JointIndex == 5){
+            continue;
+        }
+
+        JOINT_POSITION Joint = (JOINT_POSITION)(JointIndex);
+        PositionPIDs[Joint].Target = -600;
+        PositionPIDs[Joint].iState = 0;
+        SpeedPIDs[Joint].Target = -CONTROL_SPEED;
+        SpeedPIDs[Joint].iState = 0;
+        while(MD_GetMotorCurrent(Joint) < 1.5){
+
+        }
+        //Reset joint to 0 and wait 1 second
+        Enc_ResetEncoder(Joint);
+        SetJointAngle(Joint, 0);
+        SysCtlDelay(120000000 / 3);
+
+        //Move joint to origin
+        SetJointAngle(Joint, -PositionPIDs[Joint].TargetMin);
+
+        //Wait 6 seconds for joint to reach its target
+        SysCtlDelay(120000000 * 2);
+
+        //Reset joint degrees to match origin
+        Enc_ResetEncoder(Joint);
+        SetJointAngle(Joint, 0);
+    }
 }
 
 void SetJointSpeed(JOINT_POSITION Joint, float Speed){
@@ -174,10 +216,10 @@ void SetArmPosition(PositionVector Target){
     Theta4 *= 180/M_PI;
 
     //Assign all angles
-    PositionPIDs[0].Target = Theta1;
-    PositionPIDs[1].Target = Theta2;
-    PositionPIDs[2].Target = Theta3;
-    PositionPIDs[4].Target = Theta4;
+    SetJointAngle(JOINT1, Theta1);
+    SetJointAngle(JOINT2, Theta2);
+    SetJointAngle(JOINT3, -Theta3); //These two joints are reversed;
+    SetJointAngle(JOINT5, -Theta4);
 }
 
 PositionVector* GetArmPosition(void){

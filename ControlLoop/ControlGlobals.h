@@ -8,6 +8,8 @@ typedef struct sPID_tag{
     float Ki;
     float Kd;
 
+    float DcBias;
+
     float iState;
     float iMin;
     float iMax;
@@ -21,6 +23,8 @@ typedef struct sPID_tag{
     float Output;
     float OutputMin;
     float OutputMax;
+
+    float Threshold;
 } sPID;
 
 typedef struct PositionVector_tag{

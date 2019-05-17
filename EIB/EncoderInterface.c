@@ -68,7 +68,7 @@ void EI_Initialize(void){
         }
 
         //Write to MDR1
-        EI_WriteRegister(WRITE_MDR1, CMP_FLAG | BYTE_4 | EN_CNTR, Encoder);
+        EI_WriteRegister(WRITE_MDR1, BYTE_2 | EN_CNTR, Encoder);
 
         //Clear the encoder data register
         EI_ClearEncoder(Encoder);
@@ -106,9 +106,9 @@ uint8_t EI_ReadRegister(uint8_t OpCode, EncoderDeviceSelect Encoder){
     return Data;
 }
 
-int32_t EI_ReadEncoderValue(EncoderDeviceSelect Encoder){
-    int32_t EncoderValue;
-    uint32_t Byte1, Byte2, Byte3, Byte4;
+int16_t EI_ReadEncoderValue(EncoderDeviceSelect Encoder){
+    int16_t EncoderValue;
+    uint16_t Byte1, Byte2;
 
     SelectEncoderChannel(Encoder);
     SetChipSelect(true);
@@ -116,12 +116,10 @@ int32_t EI_ReadEncoderValue(EncoderDeviceSelect Encoder){
     SPI_Write(READ_CNTR);
     Byte1 = SPI_Read();
     Byte2 = SPI_Read();
-    Byte3 = SPI_Read();
-    Byte4 = SPI_Read();
 
     SetChipSelect(false);
 
-    EncoderValue = (Byte1 << 24) | (Byte2 << 16) | (Byte3 << 8) | (Byte4);
+    EncoderValue = (Byte1 << 8) | (Byte2);
 
     return EncoderValue;
 }

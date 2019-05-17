@@ -119,21 +119,21 @@
 static sPID SpeedPIDs[JOINT_COUNT] = {
           //J1
           {
-           .Kp          =   0,
-           .Ki          =   0,
-           .Kd          =   0,
+           .Kp          =   0.05,
+           .Ki          =   0.0002,
+           .Kd          =   0.03,
            .DcBias      =   0.27,
            .iState      =   0,
-           .iMin        =  -2,
-           .iMax        =   2,
+           .iMin        =  -.15,
+           .iMax        =   .15,
            .dState      =   0,
            .Target      =   0,
            .TargetMin   =  -1000,
            .TargetMax   =   1000,
            .Output      =   0,
-           .OutputMin   =  -0.65,
-           .OutputMax   =   0.65,
-           .Threshold   =   0.01
+           .OutputMin   =  0,//-0.65,
+           .OutputMax   =   0,//0.65,
+           .Threshold   =   0.5
           },
           //J2
           {

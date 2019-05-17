@@ -29,11 +29,11 @@ void EnableClock(void);
 void EnablePeripherals(void);
 void InitConsole(void);
 
-void printfloat(char *Buffer, float val, int nDecimals){
-    int UpperVal = (int)(val);
-    int LowerVal = (uint32_t)(val * pow(10,nDecimals));
-    sprintf(Buffer, "%i.%u", UpperVal, LowerVal);
-}
+//void printfloat(char *Buffer, float val, int nDecimals){
+//    int UpperVal = (int)(val);
+//    int LowerVal = (uint32_t)(val * pow(10,nDecimals));
+//    sprintf(Buffer, "%i.%u", UpperVal, LowerVal);
+//}
 
 void Wait(float seconds, float Target){
     static uint32_t SampleInterval = 120000000 / 10 / 3;
@@ -200,7 +200,8 @@ void EnablePeripherals(void){
     InitConsole();
     PinoutSet();
     //MD_Initialize();
-    InitializeControlLoop();
+    //InitializeControlLoop();
+    Enc_Initialize();
 }
 
 //Initializes UART0 to be used as a console.

@@ -75,6 +75,6 @@ void EI_Initialize(void);
 void EI_WriteRegister(uint8_t OpCode, uint8_t Data, EncoderDeviceSelect Encoder);
 void EI_ClearEncoder(EncoderDeviceSelect Encoder);
 uint8_t EI_ReadRegister(uint8_t OpCode, EncoderDeviceSelect Encoder);
-int32_t EI_ReadEncoderValue(EncoderDeviceSelect Encoder);
+int16_t EI_ReadEncoderValue(EncoderDeviceSelect Encoder);
 
 #endif

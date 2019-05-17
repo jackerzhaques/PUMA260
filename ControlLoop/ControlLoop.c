@@ -226,6 +226,17 @@ void ControlLoopISR(void){
         sPID* PositionPID = &PositionPIDs[i];
         sEncoder *Enc = Enc_GetJointEncoder(Joint);
 
+        //Todd: Filter testing
+        MD_SetMotorDutyCycle(Joint, fabs(SpeedPID->Target));
+
+        if(SpeedPID->Target < 0){
+            MD_SetMotorDirection(Joint, false);
+        }
+        else if(SpeedPID->Target > 0){
+            MD_SetMotorDirection(Joint, true);
+        }
+
+        /*
         float Error = SpeedPID->Target - Enc->Degrees;
         if(fabs(Error) > SpeedPID->Threshold){
             float P = SpeedPID->Kp * Error;
@@ -276,6 +287,7 @@ void ControlLoopISR(void){
         else if(SpeedPID->Output > 0){
             MD_SetMotorDirection(Joint, true);
         }
+        */
     }
 
     TimerIntClear(TIMER1_BASE, TIMER_TIMA_TIMEOUT);

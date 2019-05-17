@@ -27,11 +27,11 @@ static sEncoder Encoders[JOINT_COUNT] = {
 };
 
 static float TicksToDegrees[JOINT_COUNT] = {
-     0.0566627,
-     0.0399138,
-     0.0643542,
+     0.0284063,     //10209 ticks over 290 degrees
+     0.0200636,     //15700 ticks over 315 degrees
+     0.0331833,     //8890 ticks over 295 degrees
      0,         //Unknown at 4-12-19
-     0.0891472,
+     0.0380952,     //5250 ticks over 200 degrees
      0          //Unknown at 4-12-19
 };
 
@@ -48,29 +48,21 @@ void UpdateEncoders(void){
     //Read all joint values
     //We want to read the joint values as fast as possible,
     // so this must run before any math is done
-    for(i = 0; i < 1/*JOINT_COUNT*/; i++){  //Todd, encoder testing
+    for(i = 0; i < JOINT_COUNT; i++){
         EncoderDeviceSelect Encoder = (EncoderDeviceSelect)(i);
         JointValues[i] = EI_ReadEncoderValue(Encoder);
 
         //Calculate the speed in ticks per second
-        //float EncoderSpeed = SAMPLE_RATE * (JointValues[i] - Encoders[i].EncoderCount);
-
-        //if(EncoderSpeed > 4000){
-        //    EncoderSpeed = 4000;
-        //}
-        //else if(EncoderSpeed < -4000){
-        //    EncoderSpeed = -4000;
-        //}
+        float EncoderSpeed = SAMPLE_RATE * (JointValues[i] - Encoders[i].EncoderCount);
 
         //Use a simple IIR filter on the speed
-        //float FilteredSpeed = (FILTER_WEIGHT * Encoders[i].Speed)
-        //        + ((1 - FILTER_WEIGHT) * EncoderSpeed);
-
+        float FilteredSpeed = (FILTER_WEIGHT * Encoders[i].Speed)
+                + ((1 - FILTER_WEIGHT) * EncoderSpeed);
 
         float Degrees = JointValues[i] * TicksToDegrees[i];
 
         Encoders[i].EncoderCount = JointValues[i];
-        //Encoders[i].Speed = FilteredSpeed;
+        Encoders[i].Speed = FilteredSpeed;
         Encoders[i].Degrees = Degrees;
 
         //Todd, encoder testing

@@ -226,57 +226,71 @@ void ControlLoopISR(void){
         sPID* PositionPID = &PositionPIDs[i];
         sEncoder *Enc = Enc_GetJointEncoder(Joint);
 
-        //Todd: Filter testing
-        MD_SetMotorDutyCycle(Joint, fabs(SpeedPID->Target));
+#if 1
+        float PositionError = PositionPID->Target - Enc->Degrees;
+        float PositionOutputs[3] = {0};
+        PositionOutputs[0] = PositionPID->Kp * PositionError;
+        PositionOutputs[1] = PositionPID->iState + PositionPID->Ki * PositionError;
+        PositionOutputs[2] = PositionPID->Kd * (PositionPID->dState - PositionError);
 
-        if(SpeedPID->Target < 0){
-            MD_SetMotorDirection(Joint, false);
+        if(PositionOutputs[1] < PositionPID->iMin){
+            PositionOutputs[1] = PositionPID->iMin;
         }
-        else if(SpeedPID->Target > 0){
-            MD_SetMotorDirection(Joint, true);
+        else if(PositionOutputs[1] > PositionPID->iMax){
+            PositionOutputs[1] = PositionPID->iMax;
         }
 
-        /*
-        float Error = SpeedPID->Target - Enc->Degrees;
-        if(fabs(Error) > SpeedPID->Threshold){
-            float P = SpeedPID->Kp * Error;
-            float I = SpeedPID->iState + SpeedPID->Ki * Error;
-            float D = SpeedPID->Kd * (Error - SpeedPID->dState);
+        PositionPID->dState = PositionError;
+        PositionPID->iState = PositionOutputs[1];
 
-            if(I < SpeedPID->iMin){
-                I = SpeedPID->iMin;
-            }
-            else if(I > SpeedPID->iMax){
-                I = SpeedPID->iMax;
-            }
-            SpeedPID->iState = I;
-            SpeedPID->dState = Error;
+        float Speed = PositionOutputs[0] + PositionOutputs[1] + PositionOutputs[2];
+        if(Speed > PositionPID->OutputMax){
+            Speed = PositionPID->OutputMax;
+        }
+        else if(Speed < PositionPID->OutputMin){
+            Speed = PositionPID->OutputMin;
+        }
 
-            float Output = P + I + D;
+        PositionPID->Output = Speed;
+        SpeedPID->Target = Speed;
+#endif
 
-            //Add the DC offset in the direction we are travelling in
-            if(Output < 0){
-                Output -= SpeedPID->DcBias;
-            }
-            else if(Output > 0){
-                Output += SpeedPID->DcBias;
-            }
-            else{
-                //0 when Output is 0
-            }
+        float Error = SpeedPID->Target - Enc->Speed;
 
-            if(Output > SpeedPID->OutputMax){
-                Output = SpeedPID->OutputMax;
-            }
-            else if(Output < SpeedPID->OutputMin){
-                Output = SpeedPID->OutputMin;
-            }
+        float P = SpeedPID->Kp * Error;
+        float I = SpeedPID->iState + SpeedPID->Ki * Error;
+        float D = SpeedPID->Kd * (Error - SpeedPID->dState);
 
-            SpeedPID->Output = Output;
+        if(I < SpeedPID->iMin){
+            I = SpeedPID->iMin;
+        }
+        else if(I > SpeedPID->iMax){
+            I = SpeedPID->iMax;
+        }
+        SpeedPID->iState = I;
+        SpeedPID->dState = Error;
+
+        float Output = P + I + D;
+
+        //Add the DC offset in the direction we are travelling in
+        if(Output < 0){
+            Output -= SpeedPID->DcBias;
+        }
+        else if(Output > 0){
+            Output += SpeedPID->DcBias;
         }
         else{
-            SpeedPID->Output = 0;
+            //0 when Output is 0
         }
+
+        if(Output > SpeedPID->OutputMax){
+            Output = SpeedPID->OutputMax;
+        }
+        else if(Output < SpeedPID->OutputMin){
+            Output = SpeedPID->OutputMin;
+        }
+
+        SpeedPID->Output = Output;
 
         //Set the output
         MD_SetMotorDutyCycle(Joint, fabs(SpeedPID->Output));
@@ -287,7 +301,6 @@ void ControlLoopISR(void){
         else if(SpeedPID->Output > 0){
             MD_SetMotorDirection(Joint, true);
         }
-        */
     }
 
     TimerIntClear(TIMER1_BASE, TIMER_TIMA_TIMEOUT);

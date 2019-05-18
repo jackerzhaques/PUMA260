@@ -59,12 +59,36 @@ void Wait(float seconds, float Target){
     }
 }
 
+static PositionVector vec;
+
 int main(void)
 {
+    int i = 0;
     EnableClock();
     EnablePeripherals();
 
+    //Disable broken joints
+    MD_EnableMotor(JOINT4, false);
+    MD_EnableMotor(JOINT5, false);
+
+    vec.x = 10;
+    vec.y = 0;
+    vec.z = 5;
+    vec.theta = 0;
+
+    float centerx = 10;
+    float centery = 0;
+    float radius = 4;
+
     while(1){
+        float x = radius*cos(angle) + centerx;
+        float y = radius*sin(angle) + centery;
+        vec.x = x;
+        vec.y = y;
+        vec.theta = Enc_GetJointEncoder(JOINT5)->Degrees - 90;
+        SetArmPosition(vec);
+        angle += M_PI * .002;
+        SysCtlDelay(120000000 / 300);
     }
 }
 

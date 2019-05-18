@@ -22,9 +22,9 @@
  */
 
 #define     L1          13.0    //Length of joint1
-#define     L2         -2.5     //Offset from j1 to j2
+#define     L2          2.5     //Offset from j1 to j2
 #define     L3          8.0     //Length of joint2
-#define     L4         -2.5     //Offset from j2 to j3
+#define     L4          2.5     //Offset from j2 to j3
 #define     L5          8.0     //Length of joint3
 #define     L6          3.0     //Length of joint5
 
@@ -37,8 +37,10 @@ void FindJointLimits(void);
 sPID *SpeedPIDs = NULL;
 sPID *PositionPIDs = NULL;
 
+volatile static bool PositionLoopEngaged[6] = {true,true,true,false,true,false};
+
 //File global variables
-PositionVector RobotArm = {0,0,0,0,0,0};
+PositionVector RobotArm = {0,0,0,0};
 
 //Initializes the motors, encoders, and control loop ISR
 void InitializeControlLoop(void){
@@ -91,35 +93,47 @@ void InitializeTimer1(void){
 
     //Enable master interrupts
     IntMasterEnable();
+
+    //FindJointLimits();
 }
 
 //The order of joints to home
-int JointIndexes[] = {1, 2, 0, 4, 3, 5};// Joint 2 -> 3 -> 1 -> 5 -> 4 -> 6
+int JointIndexes[] = {4/*1*/, 2, 0, 4, 3, 5};// Joint 2 -> 3 -> 1 -> 5 -> 4 -> 6
 
 void FindJointLimits(void){
     int i = 0;
-    for(i = 0; i < JOINT_COUNT; i++){
+    for(i = 0; i < 1/*JOINT_COUNT*/; i++){
         int JointIndex = JointIndexes[i];
         //Skip joints that are not being used
         if(JointIndex == 3  || JointIndex == 5){
             continue;
         }
 
+        //Disable position control (so we can use speed control only)
+        PositionLoopEngaged[JointIndex] = false;
+
+        //Command the joint in a single direction until it hits its limit
         JOINT_POSITION Joint = (JOINT_POSITION)(JointIndex);
-        PositionPIDs[Joint].Target = -600;
-        PositionPIDs[Joint].iState = 0;
         SpeedPIDs[Joint].Target = -CONTROL_SPEED;
         SpeedPIDs[Joint].iState = 0;
-        while(MD_GetMotorCurrent(Joint) < 1.5){
+        while(MD_GetMotorCurrent(Joint) < 2){
 
         }
-        //Reset joint to 0 and wait 1 second
+
+
+        //Reset joint to 0
+        SpeedPIDs[Joint].Target = 0;
         Enc_ResetEncoder(Joint);
         SetJointAngle(Joint, 0);
+
+        //Wait 10 ms for write to be complete
         SysCtlDelay(120000000 / 3);
 
+        //Re-enable position control
+        PositionLoopEngaged[JointIndex] = true;
+
         //Move joint to origin
-        SetJointAngle(Joint, -PositionPIDs[Joint].TargetMin);
+        PositionPIDs[Joint].Target = -PositionPIDs[Joint].TargetMin;
 
         //Wait 6 seconds for joint to reach its target
         SysCtlDelay(120000000 * 2);
@@ -206,9 +220,9 @@ void SetArmPosition(PositionVector Target){
 
     //Assign all angles
     SetJointAngle(JOINT1, Theta1);
-    SetJointAngle(JOINT2, Theta2);
-    SetJointAngle(JOINT3, -Theta3); //These two joints are reversed;
-    SetJointAngle(JOINT5, -Theta4);
+    SetJointAngle(JOINT2, -Theta2);
+    SetJointAngle(JOINT3, Theta3);
+    SetJointAngle(JOINT5, Theta4);
 }
 
 PositionVector* GetArmPosition(void){
@@ -226,34 +240,38 @@ void ControlLoopISR(void){
         sPID* PositionPID = &PositionPIDs[i];
         sEncoder *Enc = Enc_GetJointEncoder(Joint);
 
-#if 1
-        float PositionError = PositionPID->Target - Enc->Degrees;
-        float PositionOutputs[3] = {0};
-        PositionOutputs[0] = PositionPID->Kp * PositionError;
-        PositionOutputs[1] = PositionPID->iState + PositionPID->Ki * PositionError;
-        PositionOutputs[2] = PositionPID->Kd * (PositionPID->dState - PositionError);
+        if(PositionLoopEngaged[i]){
+            float PositionError = PositionPID->Target - Enc->Degrees;
+            float PositionOutputs[3] = {0};
+            PositionOutputs[0] = PositionPID->Kp * PositionError;
+            PositionOutputs[1] = PositionPID->iState + PositionPID->Ki * PositionError;
+            PositionOutputs[2] = PositionPID->Kd * (PositionPID->dState - PositionError);
 
-        if(PositionOutputs[1] < PositionPID->iMin){
-            PositionOutputs[1] = PositionPID->iMin;
-        }
-        else if(PositionOutputs[1] > PositionPID->iMax){
-            PositionOutputs[1] = PositionPID->iMax;
-        }
+            if(PositionOutputs[1] < PositionPID->iMin){
+                PositionOutputs[1] = PositionPID->iMin;
+            }
+            else if(PositionOutputs[1] > PositionPID->iMax){
+                PositionOutputs[1] = PositionPID->iMax;
+            }
 
-        PositionPID->dState = PositionError;
-        PositionPID->iState = PositionOutputs[1];
+            PositionPID->dState = PositionError;
+            PositionPID->iState = PositionOutputs[1];
 
-        float Speed = PositionOutputs[0] + PositionOutputs[1] + PositionOutputs[2];
-        if(Speed > PositionPID->OutputMax){
-            Speed = PositionPID->OutputMax;
-        }
-        else if(Speed < PositionPID->OutputMin){
-            Speed = PositionPID->OutputMin;
-        }
+            float Speed = PositionOutputs[0] + PositionOutputs[1] + PositionOutputs[2];
+            if(Speed > PositionPID->OutputMax){
+                Speed = PositionPID->OutputMax;
+            }
+            else if(Speed < PositionPID->OutputMin){
+                Speed = PositionPID->OutputMin;
+            }
 
-        PositionPID->Output = Speed;
-        SpeedPID->Target = Speed;
-#endif
+            PositionPID->Output = Speed;
+            SpeedPID->Target = Speed;
+        }
+        else{
+            //Speed control will follow its target
+            //Do nothing here
+        }
 
         float Error = SpeedPID->Target - Enc->Speed;
 

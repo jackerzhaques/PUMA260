@@ -37,6 +37,8 @@ void FindJointLimits(void);
 sPID *SpeedPIDs = NULL;
 sPID *PositionPIDs = NULL;
 
+static PositionVector ActualArmPosition;
+
 volatile static bool PositionLoopEngaged[6] = {true,true,true,false,true,false};
 
 //File global variables
@@ -210,7 +212,7 @@ void SetArmPosition(PositionVector Target){
     float k2 = L5 * s2;
     float Theta2 = atan2(y,x) - atan2(k2,k1);
     float Theta3_ToX = Theta2 + Theta3;
-    float Theta4 = Target.theta - Theta3_ToX;
+    float Theta4 = (Target.theta * M_PI/180) - Theta3_ToX;
 
     //Convert all thetas to degrees
     Theta1 *= 180/M_PI;
@@ -227,6 +229,53 @@ void SetArmPosition(PositionVector Target){
 
 PositionVector* GetArmPosition(void){
     return 0;
+}
+
+void CalculateArmRealPos(void){
+    uint8_t i;
+    float x, y, z, xy;
+    float theta[JOINT_COUNT];
+    sEncoder *enc[JOINT_COUNT];
+
+    for(i = 0; i < JOINT_COUNT; i++){
+        enc[i] = Enc_GetJointEncoder((JOINT_POSITION)i);
+        theta[i] = enc[i]->Degrees * M_PI/180;
+    }
+    theta[1] = -theta[1];   //This joint angle is inverted
+
+    x = 0;
+    y = 0;
+    z = L1;
+
+    //z = z
+    xy = L2;
+    x = x + cos(theta[0]) * xy;
+    y = y + sin(theta[0]) * xy;
+
+    xy = cos(theta[1]) * L3;
+    z = z + (sin(theta[1]) * L3);
+    x = x + cos((theta[0]) + M_PI/2) * xy;
+    y = y + sin((theta[0]) + M_PI/2) * xy;
+
+    //z = z
+    xy = L4;
+    x = x + (xy * cos(theta[0]));
+    y = y + (xy * sin(theta[0]));
+
+    xy = cos((theta[2] + theta[1])) * L5;
+    z = z + (sin((theta[2] + theta[1])) * L5);
+    x = x + (cos((theta[0]) + M_PI/2) * xy);
+    y = y + (sin((theta[0]) + M_PI/2) * xy);
+
+    xy = cos((theta[4] + theta[2] + theta[1])) * L6;
+    z = z + (sin((theta[4] + theta[2] + theta[1])) * L6);
+    x = x + (cos((theta[0]) + M_PI/2) * xy);
+    y = y + (sin((theta[0]) + M_PI/2) * xy);
+
+    ActualArmPosition.x = x;
+    ActualArmPosition.y = y;
+    ActualArmPosition.z = z;
+    ActualArmPosition.theta = (theta[4] + theta[2] + theta[1]) * 180 / M_PI;
 }
 
 void ControlLoopISR(void){
@@ -320,6 +369,8 @@ void ControlLoopISR(void){
             MD_SetMotorDirection(Joint, true);
         }
     }
+
+    CalculateArmRealPos();
 
     TimerIntClear(TIMER1_BASE, TIMER_TIMA_TIMEOUT);
 }

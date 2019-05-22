@@ -7,6 +7,7 @@
 #include "EIB/Encoders.h"
 #include "MotorDriver/MotorDriver.h"
 #include "ControlLoop/ControlLoop.h"
+#include "EIB/Encoders.h"
 
 //Tivaware includes
 #include "inc/hw_memmap.h"
@@ -29,63 +30,33 @@ void EnableClock(void);
 void EnablePeripherals(void);
 void InitConsole(void);
 
-//void printfloat(char *Buffer, float val, int nDecimals){
-//    int UpperVal = (int)(val);
-//    int LowerVal = (uint32_t)(val * pow(10,nDecimals));
-//    sprintf(Buffer, "%i.%u", UpperVal, LowerVal);
-//}
-
-void Wait(float seconds, float Target){
-    static uint32_t SampleInterval = 120000000 / 10 / 3;
-    uint32_t DelayAmount = 120000000.0 * seconds / 3;
-    uint32_t nDelays = DelayAmount / SampleInterval;
-    uint32_t i = 0;
-    for(i = 0; i < nDelays; i++){
-        float EncVal = Enc_GetJointEncoder(JOINT3)->Degrees;
-        UARTCharPut(UART0_BASE, 0x02);
-        char Buffer[30];
-        printfloat(Buffer, EncVal, 2);
-        UARTprintf("1,");
-        UARTprintf(Buffer);
-        UARTCharPut(UART0_BASE, 0x0A);
-
-        UARTCharPut(UART0_BASE, 0x02);
-        printfloat(Buffer, Target, 2);
-        UARTprintf("2,");
-        UARTprintf(Buffer);
-        UARTCharPut(UART0_BASE, 0x0A);
-
-        SysCtlDelay(SampleInterval);
-    }
-}
-
 static PositionVector vec;
 
 int main(void)
 {
-    int i = 0;
     EnableClock();
     EnablePeripherals();
 
     //Disable broken joints
     MD_EnableMotor(JOINT4, false);
-    MD_EnableMotor(JOINT5, false);
+    //MD_EnableMotor(JOINT5, false); //Pending issue where encoder ticks are being missed when joint is rotating too fast.
+    MD_EnableMotor(JOINT6, false);
 
     vec.x = 10;
     vec.y = 0;
     vec.z = 5;
-    vec.theta = 0;
+    vec.theta = -90;
 
     float centerx = 10;
     float centery = 0;
-    float radius = 4;
+    float radius = 2;
 
     while(1){
         float x = radius*cos(angle) + centerx;
         float y = radius*sin(angle) + centery;
         vec.x = x;
         vec.y = y;
-        vec.theta = Enc_GetJointEncoder(JOINT5)->Degrees - 90;
+        vec.theta = -90;
         SetArmPosition(vec);
         angle += M_PI * .002;
         SysCtlDelay(120000000 / 300);

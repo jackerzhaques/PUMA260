@@ -191,10 +191,10 @@ static sPID SpeedPIDs[JOINT_COUNT] = {
           },
           //J5
           {
-           .Kp          =   0.0005,
-           .Ki          =   0.0001,
+           .Kp          =   0.0001,
+           .Ki          =   0.00005,
            .Kd          =   0.0000,
-           .DcBias      =   0.3000,
+           .DcBias      =   0.4500,
            .iState      =   0,
            .iMin        =  -2.0,
            .iMax        =   2.0,
@@ -229,7 +229,7 @@ static sPID SpeedPIDs[JOINT_COUNT] = {
 
 static sPID PositionPIDs[JOINT_COUNT] = {
           {//Joint 1
-           .Kp          = 100,
+           .Kp          = 1000,
            .Ki          = 0,
            .Kd          = 0,
            .DcBias      = 0,
@@ -246,7 +246,7 @@ static sPID PositionPIDs[JOINT_COUNT] = {
            .Threshold   = 0.00
           },
           {//Joint 2
-           .Kp          = 100,
+           .Kp          = 1000,
            .Ki          = 0,
            .Kd          = 0,
            .DcBias      = 0,
@@ -263,7 +263,7 @@ static sPID PositionPIDs[JOINT_COUNT] = {
            .Threshold   = 0.00
           },
           {//Joint 3
-           .Kp          = 100,
+           .Kp          = 1000,
            .Ki          = 0,
            .Kd          = 0,
            .DcBias      = 0,
@@ -295,7 +295,7 @@ static sPID PositionPIDs[JOINT_COUNT] = {
            J4_A_OMAX
           },
           {//Joint 5
-           .Kp          = 10,
+           .Kp          = 30,
            .Ki          = 0,
            .Kd          = 0,
            .DcBias      = 0,
@@ -307,8 +307,8 @@ static sPID PositionPIDs[JOINT_COUNT] = {
            .TargetMin   =-115,
            .TargetMax   = 115,
            .Output      = 0,
-           .OutputMin   =-5000,
-           .OutputMax   = 5000,
+           .OutputMin   =-750,
+           .OutputMax   = 750,
            .Threshold   = 0.00
           },
           {J6_A_KP,

@@ -24,7 +24,7 @@ void SPI_Initialize(void){
      * Frequency:   100KHz
      * Data Size:   8bits
      */
-    ui32SysClock = SysCtlClockGet();
+    ui32SysClock = 120000000;
     SSIConfigSetExpClk(SSI3_BASE, ui32SysClock, SSI_FRF_MOTO_MODE_0,
                        SSI_MODE_MASTER, 250000, 8);
 

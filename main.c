@@ -22,6 +22,9 @@
 #include "utils/uartstdio.h"
 #include "driverlib/uart.h"
 
+#define SYS_CLK         120000000
+#define SYS_DELAY_1_S   SYS_CLK / 3
+
 //Testing
 #include <math.h>
 float angle = 0;
@@ -42,24 +45,24 @@ int main(void)
     //MD_EnableMotor(JOINT5, false); //Pending issue where encoder ticks are being missed when joint is rotating too fast.
     MD_EnableMotor(JOINT6, false);
 
-    vec.x = 10;
-    vec.y = 0;
-    vec.z = 5;
-    vec.theta = -90;
-
-    float centerx = 10;
-    float centery = 0;
-    float radius = 2;
+//    vec.x = 10;
+//    vec.y = 0;
+//    vec.z = 5;
+//    vec.theta = -90;
+//
+//    float centerx = 10;
+//    float centery = 0;
+//    float radius = 2;
 
     while(1){
-        float x = radius*cos(angle) + centerx;
-        float y = radius*sin(angle) + centery;
-        vec.x = x;
-        vec.y = y;
-        vec.theta = -90;
-        SetArmPosition(vec);
-        angle += M_PI * .002;
-        SysCtlDelay(120000000 / 300);
+//        float x = radius*cos(angle) + centerx;
+//        float y = radius*sin(angle) + centery;
+//        vec.x = x;
+//        vec.y = y;
+//        vec.theta = -90;
+//        SetArmPosition(vec);
+//        angle += M_PI * .002;
+//        SysCtlDelay(120000000 / 300);
     }
 }
 

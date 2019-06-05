@@ -29,6 +29,10 @@
 #define SS1         GPIO_PIN_2
 #define SS2         GPIO_PIN_0
 
+typedef struct int24_t_tag{
+    int32_t data : 24;
+} int24_t;
+
 //Forward declarations
 void SelectEncoderChannel(EncoderDeviceSelect Encoder);
 void SetChipSelect(bool Enabled);
@@ -53,14 +57,14 @@ void EI_Initialize(void){
 
         //Write to MDR0
         EI_WriteRegister(WRITE_MDR0,
-                         FILTER_2 | DISABLE_INDX | FREE_RUN | QUADRX1,
+                         FILTER_2 | DISABLE_INDX | FREE_RUN | QUADRX4,
                          Encoder);
 
         //Verify the contents of MDR0
         //If the contents do not match, print to the UART that there is an error
         RegisterReadbackValue = EI_ReadRegister(READ_MDR0, Encoder);
         if(RegisterReadbackValue !=
-                (FILTER_2 | DISABLE_INDX | FREE_RUN | QUADRX1)){
+                (FILTER_2 | DISABLE_INDX | FREE_RUN | QUADRX4)){
             UARTprintf("Unable to connect to encoder %u\n", i + 1);
         }
         else{
@@ -68,7 +72,7 @@ void EI_Initialize(void){
         }
 
         //Write to MDR1
-        EI_WriteRegister(WRITE_MDR1, BYTE_2 | EN_CNTR, Encoder);
+        EI_WriteRegister(WRITE_MDR1, BYTE_3 | EN_CNTR, Encoder);
 
         //Clear the encoder data register
         EI_ClearEncoder(Encoder);
@@ -106,9 +110,10 @@ uint8_t EI_ReadRegister(uint8_t OpCode, EncoderDeviceSelect Encoder){
     return Data;
 }
 
-int16_t EI_ReadEncoderValue(EncoderDeviceSelect Encoder){
-    int16_t EncoderValue;
-    uint16_t Byte1, Byte2;
+int32_t EI_ReadEncoderValue(EncoderDeviceSelect Encoder){
+    int32_t EncoderValue;
+    int24_t CastVariable;   //Struct used to cast from 24 to 32 bit.
+    uint32_t Byte1, Byte2, Byte3;
 
     SelectEncoderChannel(Encoder);
     SetChipSelect(true);
@@ -116,10 +121,13 @@ int16_t EI_ReadEncoderValue(EncoderDeviceSelect Encoder){
     SPI_Write(READ_CNTR);
     Byte1 = SPI_Read();
     Byte2 = SPI_Read();
+    Byte3 = SPI_Read();
 
     SetChipSelect(false);
 
-    EncoderValue = (Byte1 << 8) | (Byte2);
+    CastVariable.data = (Byte1 << 16) | (Byte2 << 8) | Byte3;
+
+    EncoderValue = CastVariable.data;
 
     return EncoderValue;
 }

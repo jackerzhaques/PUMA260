@@ -67,7 +67,7 @@ void InitializeControlLoop(void){
     }
 
     //Initialize control loop timer
-    InitializeTimer1();
+    //InitializeTimer1();
 }
 
 void InitializeTimer1(void){

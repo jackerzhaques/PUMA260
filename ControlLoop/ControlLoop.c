@@ -39,7 +39,7 @@ sPID *PositionPIDs = NULL;
 
 static PositionVector ActualArmPosition;
 
-volatile static bool PositionLoopEngaged[6] = {true,true,true,false,true,false};
+volatile static bool PositionLoopEngaged[6] = {false,false,false,false,false,false};
 
 //File global variables
 PositionVector RobotArm = {0,0,0,0};
@@ -67,7 +67,7 @@ void InitializeControlLoop(void){
     }
 
     //Initialize control loop timer
-    //InitializeTimer1();
+    InitializeTimer1();
 }
 
 void InitializeTimer1(void){
@@ -95,8 +95,6 @@ void InitializeTimer1(void){
 
     //Enable master interrupts
     IntMasterEnable();
-
-    //FindJointLimits();
 }
 
 //The order of joints to home
@@ -358,6 +356,10 @@ void ControlLoopISR(void){
         }
 
         SpeedPID->Output = Output;
+
+//        if(SpeedPID->Target > 0) SpeedPID->Output = SpeedPID->DcBias;
+//        else if(SpeedPID->Target < 0) SpeedPID->Output = SpeedPID->DcBias;
+//        else SpeedPID->Output = 0;
 
         //Set the output
         MD_SetMotorDutyCycle(Joint, fabs(SpeedPID->Output));

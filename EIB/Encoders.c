@@ -27,12 +27,12 @@ static sEncoder Encoders[JOINT_COUNT] = {
 };
 
 static float TicksToDegrees[JOINT_COUNT] = {
-     0.0284063,     //10209 ticks over 290 degrees
-     0.0200636,     //15700 ticks over 315 degrees
-     0.0331833,     //8890 ticks over 295 degrees
-     0,         //Unknown at 4-12-19
-     0.0380952,     //5250 ticks over 200 degrees
-     0          //Unknown at 4-12-19
+     0.0071005,     //40842 ticks over 290 degrees
+     0.0050458,     //62428 ticks over 315 degrees
+     0.0082716,     //35664 ticks over 295 degrees
+     0,             //Unknown at 4-12-19
+     0.0094661,     //21128 ticks over 200 degrees
+     0              //Unknown at 4-12-19
 };
 
 void printfloat(char *Buffer, float val, int nDecimals){
@@ -64,23 +64,6 @@ void UpdateEncoders(void){
         Encoders[i].EncoderCount = JointValues[i];
         Encoders[i].Speed = FilteredSpeed;
         Encoders[i].Degrees = Degrees;
-
-        //Todd, encoder testing
-        if(i == 0){
-            static int lastc = -1;
-            char c[10], d[10];
-
-            if(Encoders[i].EncoderCount != lastc){
-                printfloat(c, Encoders[i].EncoderCount, 0);
-                printfloat(d, Encoders[i].Degrees, 2);
-                UARTprintf(c);
-                UARTprintf(",");
-                UARTprintf(d);
-                UARTCharPut(UART0_BASE, 0x0A);
-            }
-
-            lastc = Encoders[i].EncoderCount;
-        }
     }
 
     TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);

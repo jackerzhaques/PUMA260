@@ -115,6 +115,11 @@ int32_t EI_ReadEncoderValue(EncoderDeviceSelect Encoder){
     int24_t CastVariable;   //Struct used to cast from 24 to 32 bit.
     uint32_t Byte1, Byte2, Byte3;
 
+    if(Encoder == ENC_SEL_2){
+        uint8_t i = 0;
+        i = 10;
+    }
+
     SelectEncoderChannel(Encoder);
     SetChipSelect(true);
 

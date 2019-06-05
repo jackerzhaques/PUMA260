@@ -119,13 +119,13 @@
 static sPID SpeedPIDs[JOINT_COUNT] = {
           //J1
           {
-           .Kp          =   0.0005,
-           .Ki          =   0.0001,
-           .Kd          =   0.0001,
-           .DcBias      =   0.27,
+           .Kp          =   0.0001,
+           .Ki          =   0.00001,
+           .Kd          =   0.0000,
+           .DcBias      =   0.1,
            .iState      =   0,
-           .iMin        =  -2.0,
-           .iMax        =   2.0,
+           .iMin        =  -1.0,
+           .iMax        =   1.0,
            .dState      =   0,
            .Target      =   0,
            .TargetMin   =  -5000,
@@ -137,10 +137,10 @@ static sPID SpeedPIDs[JOINT_COUNT] = {
           },
           //J2
           {
-           .Kp          =   0.0005,
-           .Ki          =   0.0001,
+           .Kp          =   0.00002,
+           .Ki          =   0.0000011,
            .Kd          =   0.0000,
-           .DcBias      =   0.3000,
+           .DcBias      =   0.3,
            .iState      =   0,
            .iMin        =  -2.0,
            .iMax        =   2.0,
@@ -155,8 +155,8 @@ static sPID SpeedPIDs[JOINT_COUNT] = {
           },
           //J3
           {
-           .Kp          =   0.0005,
-           .Ki          =   0.0001,
+           .Kp          =   0.0000,
+           .Ki          =   0.0000,
            .Kd          =   0.0000,
            .DcBias      =   0.3000,
            .iState      =   0,
@@ -191,8 +191,8 @@ static sPID SpeedPIDs[JOINT_COUNT] = {
           },
           //J5
           {
-           .Kp          =   0.0001,
-           .Ki          =   0.00005,
+           .Kp          =   0.0000,
+           .Ki          =   0.00000,
            .Kd          =   0.0000,
            .DcBias      =   0.4500,
            .iState      =   0,

@@ -39,7 +39,7 @@ sPID *PositionPIDs = NULL;
 
 static PositionVector ActualArmPosition;
 
-volatile static bool PositionLoopEngaged[6] = {false,false,false,false,false,false};
+volatile static bool PositionLoopEngaged[6] = {true,false,false,false,false,false};
 
 //File global variables
 PositionVector RobotArm = {0,0,0,0};
@@ -176,14 +176,14 @@ void SetJointAngle(JOINT_POSITION Joint, float Angle){
     PositionPIDs[Joint].iState = 0;
 
     //Set the SpeedPID to travel in the correct direction at 500 ticks per second
-    float PositionError = Angle - Enc_GetJointEncoder(Joint)->Degrees;
-    if(PositionError < 0){
-        SpeedPIDs[Joint].Target = -CONTROL_SPEED;
-    }
-    else{
-        SpeedPIDs[Joint].Target = CONTROL_SPEED;
-    }
-    SpeedPIDs[Joint].iState = 0;
+    //float PositionError = Angle - Enc_GetJointEncoder(Joint)->Degrees;
+    //if(PositionError < 0){
+    //    SpeedPIDs[Joint].Target = -CONTROL_SPEED;
+    //}
+    //else{
+    //    SpeedPIDs[Joint].Target = CONTROL_SPEED;
+    //}
+    //SpeedPIDs[Joint].iState = 0;
 }
 
 void SetArmPosition(PositionVector Target){

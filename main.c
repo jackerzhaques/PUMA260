@@ -52,17 +52,18 @@ int main(void)
 //
 //    float centerx = 10;
 //    float centery = 0;
-//    float radius = 2;
+      float radius = 80;
 
     while(1){
-//        float x = radius*cos(angle) + centerx;
+          float x = radius*cos(angle);// + centerx;
 //        float y = radius*sin(angle) + centery;
 //        vec.x = x;
 //        vec.y = y;
 //        vec.theta = -90;
 //        SetArmPosition(vec);
-//        angle += M_PI * .002;
-//        SysCtlDelay(120000000 / 300);
+          SetJointAngle(JOINT2, x);
+          angle += M_PI * .001;
+          SysCtlDelay(120000000 / 300);
     }
 }
 

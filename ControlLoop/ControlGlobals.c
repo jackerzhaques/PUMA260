@@ -229,9 +229,9 @@ static sPID SpeedPIDs[JOINT_COUNT] = {
 
 static sPID PositionPIDs[JOINT_COUNT] = {
           {//Joint 1
-           .Kp          = 1000,
+           .Kp          = 10000,
            .Ki          = 0,
-           .Kd          = 0,
+           .Kd          = 1000,
            .DcBias      = 0,
            .iState      = 0,
            .iMin        =-100,
@@ -246,9 +246,9 @@ static sPID PositionPIDs[JOINT_COUNT] = {
            .Threshold   = 0.00
           },
           {//Joint 2
-           .Kp          = 1000,
+           .Kp          = 10000,
            .Ki          = 0,
-           .Kd          = 0,
+           .Kd          = 1000,
            .DcBias      = 0,
            .iState      = 0,
            .iMin        =-100,

@@ -39,7 +39,7 @@ sPID *PositionPIDs = NULL;
 
 static PositionVector ActualArmPosition;
 
-volatile static bool PositionLoopEngaged[6] = {true,false,false,false,false,false};
+volatile static bool PositionLoopEngaged[6] = {true,true,true,false,true,false};
 
 //File global variables
 PositionVector RobotArm = {0,0,0,0};

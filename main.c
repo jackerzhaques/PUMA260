@@ -45,23 +45,22 @@ int main(void)
     //MD_EnableMotor(JOINT5, false); //Pending issue where encoder ticks are being missed when joint is rotating too fast.
     MD_EnableMotor(JOINT6, false);
 
-//    vec.x = 10;
-//    vec.y = 0;
-//    vec.z = 5;
-//    vec.theta = -90;
-//
-//    float centerx = 10;
-//    float centery = 0;
-      float radius = 80;
+      vec.x = 10;
+      vec.y = 0;
+      vec.z = 5;
+      vec.theta = 0;
+
+      float centerx = 10;
+      float centery = 0;
+      float radius = 3;
 
     while(1){
-          float x = radius*cos(angle);// + centerx;
-//        float y = radius*sin(angle) + centery;
-//        vec.x = x;
-//        vec.y = y;
-//        vec.theta = -90;
-//        SetArmPosition(vec);
-          SetJointAngle(JOINT2, x);
+          float x = radius*cos(angle) + centerx;
+          float y = radius*sin(angle) + centery;
+          vec.x = x;
+          vec.y = y;
+          //vec.theta = -90;
+          SetArmPosition(vec);
           angle += M_PI * .001;
           SysCtlDelay(120000000 / 300);
     }

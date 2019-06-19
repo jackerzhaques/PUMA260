@@ -52,7 +52,7 @@ int main(void)
 
       float centerx = 10;
       float centery = 0;
-      float radius = 3;
+      float radius = 1.5;
 
     while(1){
           float x = radius*cos(angle) + centerx;

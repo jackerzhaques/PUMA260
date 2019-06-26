@@ -7,7 +7,6 @@
 /*
  * Project includes
  */
-#include "EIB/SPI.h"
 #include "Globals.h"
 
 /*
@@ -17,6 +16,7 @@
 #include "inc/hw_memmap.h"
 #include "utils/uartstdio.h"
 #include <driverlib/sysctl.h>
+#include <EIB/OldSPI.h>
 
 /*
  * Pin defines
@@ -65,10 +65,10 @@ void EI_Initialize(void){
         RegisterReadbackValue = EI_ReadRegister(READ_MDR0, Encoder);
         if(RegisterReadbackValue !=
                 (FILTER_2 | DISABLE_INDX | FREE_RUN | QUADRX4)){
-            UARTprintf("Unable to connect to encoder %u\n", i + 1);
+            //UARTprintf("Unable to connect to encoder %u\n", i + 1);
         }
         else{
-            UARTprintf("Successfully connected to encoder %u\n", i + 1);
+            //UARTprintf("Successfully connected to encoder %u\n", i + 1);
         }
 
         //Write to MDR1

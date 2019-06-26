@@ -15,6 +15,10 @@ main.obj: C:/Users/s219/Documents/PUMA260/Globals.h
 main.obj: ../MotorDriver/MotorDriver.h
 main.obj: ../ControlLoop/ControlLoop.h
 main.obj: ../ControlLoop/ControlGlobals.h
+main.obj: ../Mailbox/MessageSubscriber.h
+main.obj: ../Mailbox/Message.h
+main.obj: ../Tasks/DeviceTasks.h
+main.obj: ../EIB/SPI.h
 main.obj: C:/ti/TivaWare_C_Series-2.1.4.178/inc/hw_memmap.h
 main.obj: C:/ti/TivaWare_C_Series-2.1.4.178/driverlib/gpio.h
 main.obj: C:/ti/TivaWare_C_Series-2.1.4.178/driverlib/rom.h
@@ -47,6 +51,10 @@ C:/Users/s219/Documents/PUMA260/Globals.h:
 ../MotorDriver/MotorDriver.h: 
 ../ControlLoop/ControlLoop.h: 
 ../ControlLoop/ControlGlobals.h: 
+../Mailbox/MessageSubscriber.h: 
+../Mailbox/Message.h: 
+../Tasks/DeviceTasks.h: 
+../EIB/SPI.h: 
 C:/ti/TivaWare_C_Series-2.1.4.178/inc/hw_memmap.h: 
 C:/ti/TivaWare_C_Series-2.1.4.178/driverlib/gpio.h: 
 C:/ti/TivaWare_C_Series-2.1.4.178/driverlib/rom.h: 

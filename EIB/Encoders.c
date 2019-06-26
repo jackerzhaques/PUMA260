@@ -109,7 +109,7 @@ void Enc_ResetEncoder(JOINT_POSITION Joint){
     Encoders[Joint].Degrees = 0;
     Encoders[Joint].Speed = 0;
     Encoders[Joint].NotMoving = false;
-    EI_ClearEncoder(Joint);
+    EI_ClearEncoder((EncoderDeviceSelect)Joint);
 }
 
 sEncoder* Enc_GetJointEncoder(JOINT_POSITION Joint){

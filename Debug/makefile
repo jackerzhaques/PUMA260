@@ -17,8 +17,16 @@ ORDERED_OBJS += \
 "./ControlLoop/ControlLoop.obj" \
 "./EIB/EncoderInterface.obj" \
 "./EIB/Encoders.obj" \
+"./EIB/OldSPI.obj" \
 "./EIB/SPI.obj" \
+"./Mailbox/Mailbox.obj" \
+"./Mailbox/MessageQueue.obj" \
+"./Mailbox/MessageSubscriber.obj" \
+"./Mailbox/UARTHandler.obj" \
 "./MotorDriver/MotorDriver.obj" \
+"./TaskScheduler/PriorityQueue.obj" \
+"./TaskScheduler/TaskScheduler.obj" \
+"./Tasks/DeviceTasks.obj" \
 "./utils/uartstdio.obj" \
 "../tm4c1294ncpdt.cmd" \
 $(GEN_CMDS__FLAG) \
@@ -35,12 +43,18 @@ RMDIR := RMDIR /S/Q
 -include subdir_vars.mk
 -include ControlLoop/subdir_vars.mk
 -include EIB/subdir_vars.mk
+-include Mailbox/subdir_vars.mk
 -include MotorDriver/subdir_vars.mk
+-include TaskScheduler/subdir_vars.mk
+-include Tasks/subdir_vars.mk
 -include utils/subdir_vars.mk
 -include subdir_rules.mk
 -include ControlLoop/subdir_rules.mk
 -include EIB/subdir_rules.mk
+-include Mailbox/subdir_rules.mk
 -include MotorDriver/subdir_rules.mk
+-include TaskScheduler/subdir_rules.mk
+-include Tasks/subdir_rules.mk
 -include utils/subdir_rules.mk
 -include objects.mk
 
@@ -172,8 +186,8 @@ PUMA260.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(BIN_OUTPUTS__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "main.obj" "pinout.obj" "tm4c1294ncpdt_startup_ccs.obj" "ControlLoop\ControlGlobals.obj" "ControlLoop\ControlLoop.obj" "EIB\EncoderInterface.obj" "EIB\Encoders.obj" "EIB\SPI.obj" "MotorDriver\MotorDriver.obj" "utils\uartstdio.obj" 
-	-$(RM) "main.d" "pinout.d" "tm4c1294ncpdt_startup_ccs.d" "ControlLoop\ControlGlobals.d" "ControlLoop\ControlLoop.d" "EIB\EncoderInterface.d" "EIB\Encoders.d" "EIB\SPI.d" "MotorDriver\MotorDriver.d" "utils\uartstdio.d" 
+	-$(RM) "main.obj" "pinout.obj" "tm4c1294ncpdt_startup_ccs.obj" "ControlLoop\ControlGlobals.obj" "ControlLoop\ControlLoop.obj" "EIB\EncoderInterface.obj" "EIB\Encoders.obj" "EIB\OldSPI.obj" "EIB\SPI.obj" "Mailbox\Mailbox.obj" "Mailbox\MessageQueue.obj" "Mailbox\MessageSubscriber.obj" "Mailbox\UARTHandler.obj" "MotorDriver\MotorDriver.obj" "TaskScheduler\PriorityQueue.obj" "TaskScheduler\TaskScheduler.obj" "Tasks\DeviceTasks.obj" "utils\uartstdio.obj" 
+	-$(RM) "main.d" "pinout.d" "tm4c1294ncpdt_startup_ccs.d" "ControlLoop\ControlGlobals.d" "ControlLoop\ControlLoop.d" "EIB\EncoderInterface.d" "EIB\Encoders.d" "EIB\OldSPI.d" "EIB\SPI.d" "Mailbox\Mailbox.d" "Mailbox\MessageQueue.d" "Mailbox\MessageSubscriber.d" "Mailbox\UARTHandler.d" "MotorDriver\MotorDriver.d" "TaskScheduler\PriorityQueue.d" "TaskScheduler\TaskScheduler.d" "Tasks\DeviceTasks.d" "utils\uartstdio.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

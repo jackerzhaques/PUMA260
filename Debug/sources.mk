@@ -114,6 +114,9 @@ SUBDIRS := \
 . \
 ControlLoop \
 EIB \
+Mailbox \
 MotorDriver \
+TaskScheduler \
+Tasks \
 utils \
 

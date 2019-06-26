@@ -15,6 +15,7 @@ void SetJointSpeed(JOINT_POSITION Joint, float Speed);
 
 //Angle control functions
 void SetJointAngle(JOINT_POSITION Joint, float Angle);
+float GetJointAngle(JOINT_POSITION Joint);
 
 //Position control functions
 void SetArmPosition(PositionVector Target);

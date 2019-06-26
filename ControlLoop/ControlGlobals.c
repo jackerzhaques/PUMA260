@@ -114,7 +114,7 @@ static sPID SpeedPIDs[JOINT_COUNT] = {
 
 static sPID PositionPIDs[JOINT_COUNT] = {
           {//Joint 1
-           .Kp          = 10000,
+           .Kp          = 500,
            .Ki          = 0,
            .Kd          = 1000,
            .DcBias      = 0,
@@ -131,7 +131,7 @@ static sPID PositionPIDs[JOINT_COUNT] = {
            .Threshold   = 0.00
           },
           {//Joint 2
-           .Kp          = 10000,
+           .Kp          = 500,
            .Ki          = 0,
            .Kd          = 1000,
            .DcBias      = 0,
@@ -148,7 +148,7 @@ static sPID PositionPIDs[JOINT_COUNT] = {
            .Threshold   = 0.00
           },
           {//Joint 3
-           .Kp          = 10000,
+           .Kp          = 500,
            .Ki          = 0,
            .Kd          = 1000,
            .DcBias      = 0,
@@ -180,7 +180,7 @@ static sPID PositionPIDs[JOINT_COUNT] = {
            0
           },
           {//Joint 5
-           .Kp          = 10000,
+           .Kp          = 500,
            .Ki          = 0,
            .Kd          = 1000,
            .DcBias      = 0,

@@ -4,8 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-void SPI_Initialize(void);
-void SPI_Write(uint8_t Data);
-uint8_t SPI_Read(void);
+void InitializeSPI(uint32_t sysClk);
+void SPIWriteBuffer(uint8_t *buffer, uint8_t nBytes);
 
 #endif

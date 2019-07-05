@@ -70,6 +70,6 @@ void EnablePeripherals(void){
 
     PinoutSet();
     InitializeTasks(SYS_CLK);
-    InitializeControlLoop();
-    //InitializeSPI(SYS_CLK);
+    //InitializeControlLoop();
+    InitializeSPI(SYS_CLK);
 }

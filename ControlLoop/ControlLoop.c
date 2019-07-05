@@ -152,15 +152,6 @@ void SetJointSpeed(JOINT_POSITION Joint, float Speed){
         Speed = SpeedPIDs[Joint].TargetMin;
     }
 
-    if(Speed < 0){
-        //SpeedPIDs[Joint].OutputMin = -0.75;
-        //SpeedPIDs[Joint].OutputMax = 0;
-    }
-    else{
-        //SpeedPIDs[Joint].OutputMin = 0;
-        //SpeedPIDs[Joint].OutputMax = 0.75;
-    }
-
     SpeedPIDs[Joint].Target = Speed;
 }
 
@@ -174,16 +165,6 @@ void SetJointAngle(JOINT_POSITION Joint, float Angle){
 
     PositionPIDs[Joint].Target = Angle;
     PositionPIDs[Joint].iState = 0;
-
-    //Set the SpeedPID to travel in the correct direction at 500 ticks per second
-    //float PositionError = Angle - Enc_GetJointEncoder(Joint)->Degrees;
-    //if(PositionError < 0){
-    //    SpeedPIDs[Joint].Target = -CONTROL_SPEED;
-    //}
-    //else{
-    //    SpeedPIDs[Joint].Target = CONTROL_SPEED;
-    //}
-    //SpeedPIDs[Joint].iState = 0;
 }
 
 float GetJointAngle(JOINT_POSITION Joint){
@@ -360,10 +341,6 @@ void ControlLoopISR(void){
         }
 
         SpeedPID->Output = Output;
-
-//        if(SpeedPID->Target > 0) SpeedPID->Output = SpeedPID->DcBias;
-//        else if(SpeedPID->Target < 0) SpeedPID->Output = SpeedPID->DcBias;
-//        else SpeedPID->Output = 0;
 
         //Set the output
         MD_SetMotorDutyCycle(Joint, fabs(SpeedPID->Output));
